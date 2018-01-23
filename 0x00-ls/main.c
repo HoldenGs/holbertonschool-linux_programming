@@ -1,17 +1,15 @@
 #include "header.h"
 
-#define ERROR 1
-
 int errno;
 
 /**
  * main - main ls function
  *
- * Return: 0
+ * Return: 0, or the errno of the error
  */
 int main(int argc, char **argv)
 {
-	char dir[400], format, hidden;
+	char dir[400], error_message[400], format, hidden;
 	int i, j, max_src_bytes = 397;
 	DIR *dirp;
 
@@ -21,13 +19,8 @@ int main(int argc, char **argv)
 	{
 		if (argv[i][0] != '-')
 		{
-			if (argv[i][0] != '/')
-			{
-				strcpy(dir, "./");
-				strncat(dir, argv[i], max_src_bytes);
-			}
-			else
-				strcpy(dir, argv[i]);
+			memset(dir, 0, strlen(dir));
+			strcpy(dir, argv[i]);
 		}
 		else
 		{
@@ -43,14 +36,16 @@ int main(int argc, char **argv)
 		}
 	}
 
-	printf("%s\n", dir);
+
 	dirp = opendir(dir);
 	if (dirp == NULL)
 	{
-		perror("");
-		printf("%i\n", errno);
-		return (ERROR);
+		strcpy(error_message, "hls: cannot access ");
+		max_src_bytes = 381;
+		perror(strncat(error_message, dir, max_src_bytes));
+		return (errno);
 	}
+
 
 	switch(format)
 	{
@@ -63,6 +58,7 @@ int main(int argc, char **argv)
 		default:
 			print_ls(hidden, '\t', dirp);
 	}
+
 
 	closedir(dirp);
 	return (0);
