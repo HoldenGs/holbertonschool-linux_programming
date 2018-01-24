@@ -29,6 +29,8 @@ int main(int argc, char **argv)
 					format = 'l';
 				if (argv[i][j] == 'a')
 					hidden = 'a';
+				else if (argv[i][j] == 'A')
+					hidden = 'A';
 			}
 		}
 		else
@@ -92,6 +94,16 @@ int print_ls(char hidden, char format, DIR *dirp)
 			printf("%s", read->d_name);
 			if (read != NULL)
 				putchar(format);
+		}
+		else if (hidden == 'A')
+		{
+			if (strcmp(read->d_name, ".") != 0 &&
+				strcmp(read->d_name, "..") != 0)
+			{
+				printf("%s", read->d_name);
+				if (read != NULL)
+					putchar(format);
+			}
 		}
 		else
 		{
