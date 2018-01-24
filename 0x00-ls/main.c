@@ -10,19 +10,16 @@ int errno;
 int main(int argc, char **argv)
 {
 	char dir[400], error_message[400], format, hidden;
-	int i, j, max_src_bytes = 397;
+	int i, j, dir_count, max_src_bytes = 397;
+	dir_list_t *dir_list, *dir_node;
 	DIR *dirp;
 
+	dir_count = 0;
 
 	strcpy(dir, ".");
 	for (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
-		{
-			memset(dir, 0, strlen(dir));
-			strcpy(dir, argv[i]);
-		}
-		else
+		if (argv[i][0] == '-')
 		{
 			for (j = 1; argv[i][j]; j++)
 			{
@@ -34,32 +31,45 @@ int main(int argc, char **argv)
 					hidden = 'a';
 			}
 		}
+		else
+		{
+			memset(dir, 0, strlen(dir));
+			strcpy(dir, argv[i]);
+			append_dir_list(&dir_list, dir);
+			dir_count++;
+		}
 	}
 
 
-	dirp = opendir(dir);
-	if (dirp == NULL)
+	for (dir_node = dir_list; dir_node != NULL; dir_node = dir_node->next)
 	{
-		strcpy(error_message, "hls: cannot access ");
-		max_src_bytes = 381;
-		perror(strncat(error_message, dir, max_src_bytes));
-		return (errno);
+		dirp = opendir(dir_node->dir);
+		if (dirp == NULL)
+		{
+			strcpy(error_message, "hls: cannot access ");
+			max_src_bytes = 381;
+			perror(strncat(error_message, dir_node->dir, max_src_bytes));
+			return (errno);
+		}
+
+
+		printf("%s:\n", dir_node->dir);
+		switch(format)
+		{
+			case '1':
+				print_ls(hidden, '\n', dirp);
+				break;
+			case 'l':
+				print_ls(hidden, '\n', dirp);
+				break;
+			default:
+				print_ls(hidden, '\t', dirp);
+		}
+		if (dir_node->next != NULL)
+			putchar('\n');
 	}
 
-
-	switch(format)
-	{
-		case '1':
-			print_ls(hidden, '\n', dirp);
-			break;
-		case 'l':
-			print_ls(hidden, '\n', dirp);
-			break;
-		default:
-			print_ls(hidden, '\t', dirp);
-	}
-
-
+	free_dir_list(&dir_list);
 	closedir(dirp);
 	return (0);
 }
