@@ -52,8 +52,8 @@ int main(int argc, char **argv)
 			return (errno);
 		}
 
-
-		printf("%s:\n", dir_node->dir);
+		if (dir_count > 1)
+			printf("%s:\n", dir_node->dir);
 		switch(format)
 		{
 			case '1':
