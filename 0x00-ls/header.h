@@ -42,7 +42,7 @@ typedef struct file_list_s
 
 /* main.c */
 int main(int, char **);
-int print_ls(char, char, file_list_t *);
+int print_ls(char, char, dir_list_t *, file_list_t *);
 
 /* dir_list.c */
 dir_list_t *add_dir_node(dir_list_t **, char[400]);

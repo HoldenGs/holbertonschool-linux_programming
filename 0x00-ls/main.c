@@ -84,13 +84,13 @@ int main(int argc, char **argv)
 		switch (format)
 		{
 			case '1':
-				print_ls(hidden, '\n', file_list);
+				print_ls(hidden, '\n', NULL, file_list);
 				break;
 			case 'l':
-				print_ls(hidden, '\n', file_list);
+				print_ls(hidden, '\n', dir_list, file_list);
 				break;
 			default:
-				print_ls(hidden, '\t', file_list); 
+				print_ls(hidden, '\t', NULL, file_list); 
 		}
 		if (dir_list->next != NULL)
 			putchar('\n');
@@ -110,11 +110,12 @@ int main(int argc, char **argv)
  *
  * @hidden: parameter denoting the option for revealing hidden files
  * @format: printing format parameter
- * @dirp: pointer to the directory data
+ * @curr_dir: current directory to be printed
+ * @file_list: pointer to the directory data
  *
  * Return: 0 for success, 1 for failure
  */
-int print_ls(char hidden, char format, file_list_t *file_list)
+int print_ls(char hidden, char format, dir_list_t *curr_dir, file_list_t *file_list)
 {
 	while (file_list != NULL)
 	{
