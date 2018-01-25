@@ -1,20 +1,29 @@
 #include "header.h"
 
-int errno;
 
 /**
  * main - main ls function
+ *
+ * @argc: argument count
+ * @argv: argument vector
  *
  * Return: 0, or the errno of the error
  */
 int main(int argc, char **argv)
 {
+	struct dirent *read;
 	char dir[400], error_message[400], format, hidden;
 	int i, j, dir_count, max_src_bytes = 397;
-	dir_list_t *dir_list, *dir_node;
+	dir_list_t *dir_list, *dir_head;
+	file_list_t *file_list;
 	DIR *dirp;
+	int errno;
 
+	format = ' ';
+	hidden = ' ';
 	dir_count = 0;
+	file_list = NULL;
+	dir_list = NULL;
 
 	strcpy(dir, ".");
 	for (i = 1; i < argc; i++)
@@ -25,7 +34,7 @@ int main(int argc, char **argv)
 			{
 				if (argv[i][j] == '1')
 					format = '1';
-				if (argv[i][j] == 'l')
+				else if (argv[i][j] == 'l')
 					format = 'l';
 				if (argv[i][j] == 'a')
 					hidden = 'a';
@@ -35,44 +44,62 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-			memset(dir, 0, strlen(dir));
-			strcpy(dir, argv[i]);
-			append_dir_list(&dir_list, dir);
+			memset(dir, 0, 2);
+			strncpy(dir, argv[i], max_src_bytes);
+			dir_list = add_dir_node(&dir_list, dir);
+			if (dir_count == 0)
+				dir_list->next = NULL;
 			dir_count++;
 		}
 	}
 
-
-	for (dir_node = dir_list; dir_node != NULL; dir_node = dir_node->next)
+	if (dir_count == 0)
 	{
-		dirp = opendir(dir_node->dir);
+		dir_list = add_dir_node(&dir_list, dir);
+		dir_list->next = NULL;
+	}
+
+
+	dir_head = dir_list;
+	while (dir_list != NULL)
+	{
+		dirp = opendir(dir_list->dir);
 		if (dirp == NULL)
 		{
 			strcpy(error_message, "hls: cannot access ");
 			max_src_bytes = 381;
-			perror(strncat(error_message, dir_node->dir, max_src_bytes));
+			perror(strncat(error_message, dir_list->dir, max_src_bytes));
 			return (errno);
 		}
-
 		if (dir_count > 1)
-			printf("%s:\n", dir_node->dir);
-		switch(format)
+			printf("%s:\n", dir_list->dir);
+
+
+		while ((read = readdir(dirp)) != NULL)
+			file_list = add_file_node(&file_list, read->d_name);
+		cocktail_sort_list(&file_list);
+
+
+		switch (format)
 		{
 			case '1':
-				print_ls(hidden, '\n', dirp);
+				print_ls(hidden, '\n', file_list);
 				break;
 			case 'l':
-				print_ls(hidden, '\n', dirp);
+				print_ls(hidden, '\n', file_list);
 				break;
 			default:
-				print_ls(hidden, '\t', dirp);
+				print_ls(hidden, '\t', file_list); 
 		}
-		if (dir_node->next != NULL)
+		if (dir_list->next != NULL)
 			putchar('\n');
+
+		free_file_list(&file_list);
+		closedir(dirp);
+		dir_list = dir_list->next;
 	}
 
-	free_dir_list(&dir_list);
-	closedir(dirp);
+	free_dir_list(&dir_head);
 	return (0);
 }
 
@@ -80,40 +107,42 @@ int main(int argc, char **argv)
 /**
  * print_ls - print contents in the default ls format, i.e. columns
  *
+ * @hidden: parameter denoting the option for revealing hidden files
+ * @format: printing format parameter
+ * @dirp: pointer to the directory data
+ *
  * Return: 0 for success, 1 for failure
  */
-int print_ls(char hidden, char format, DIR *dirp)
+int print_ls(char hidden, char format, file_list_t *file_list)
 {
-	struct dirent *read;
-
-
-	while ((read = readdir(dirp)) != NULL)
+	while (file_list != NULL)
 	{
 		if (hidden == 'a')
 		{
-			printf("%s", read->d_name);
-			if (read != NULL)
+			printf("%s", file_list->file);
+			if (file_list->next != NULL)
 				putchar(format);
 		}
 		else if (hidden == 'A')
 		{
-			if (strcmp(read->d_name, ".") != 0 &&
-				strcmp(read->d_name, "..") != 0)
+			if (strcmp(file_list->file, ".") != 0 &&
+				strcmp(file_list->file, "..") != 0)
 			{
-				printf("%s", read->d_name);
-				if (read != NULL)
+				printf("%s", file_list->file);
+				if (file_list->next != NULL)
 					putchar(format);
 			}
 		}
 		else
 		{
-			if (read->d_name[0] != '.')
+			if (file_list->file[0] != '.')
 			{
-				printf("%s", read->d_name);
-				if (read != NULL)
+				printf("%s", file_list->file);
+				if (file_list->next != NULL)
 					putchar(format);
 			}
 		}
+		file_list = file_list->next;
 	}
 	if (format == '\t')
 		printf("\n");
