@@ -7,6 +7,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <locale.h>
 
 
 /**
@@ -46,6 +47,7 @@ int print_ls(char, char, file_list_t *);
 /* dir_list.c */
 dir_list_t *add_dir_node(dir_list_t **, char[400]);
 void free_dir_list(dir_list_t **);
+dir_list_t *reverse_dir_list(dir_list_t **head);
 
 /* file_list.c */
 file_list_t *add_file_node(file_list_t **head, const char[256]);

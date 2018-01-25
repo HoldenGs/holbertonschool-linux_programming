@@ -24,6 +24,7 @@ int main(int argc, char **argv)
 	dir_count = 0;
 	file_list = NULL;
 	dir_list = NULL;
+	setlocale(LC_ALL, "");
 
 	strcpy(dir, ".");
 	for (i = 1; i < argc; i++)
@@ -59,7 +60,7 @@ int main(int argc, char **argv)
 		dir_list->next = NULL;
 	}
 
-
+	dir_list = reverse_dir_list(&dir_list);
 	dir_head = dir_list;
 	while (dir_list != NULL)
 	{
@@ -100,7 +101,7 @@ int main(int argc, char **argv)
 	}
 
 	free_dir_list(&dir_head);
-	return (0);
+	return 0;
 }
 
 
@@ -125,8 +126,8 @@ int print_ls(char hidden, char format, file_list_t *file_list)
 		}
 		else if (hidden == 'A')
 		{
-			if (strcmp(file_list->file, ".") != 0 &&
-				strcmp(file_list->file, "..") != 0)
+			if (strcoll(file_list->file, ".") != 0 &&
+				strcoll(file_list->file, "..") != 0)
 			{
 				printf("%s", file_list->file);
 				if (file_list->next != NULL)
@@ -147,5 +148,5 @@ int print_ls(char hidden, char format, file_list_t *file_list)
 	if (format == '\t')
 		printf("\n");
 
-	return (0);
+	return 0;
 }

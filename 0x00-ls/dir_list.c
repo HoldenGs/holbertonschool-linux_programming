@@ -19,7 +19,7 @@ dir_list_t *add_dir_node(dir_list_t **head, char dir[400])
 	strncpy(node->dir, dir, 400);
 	node->next = *head;
 	*head = node;
-	return (node);
+	return node;
 }
 
 
@@ -44,4 +44,28 @@ void free_dir_list(dir_list_t **head)
 		free(tmp);
 	}
 	*head = NULL;
+}
+
+
+/**
+ * reverse_dir_list - reverse a linked list
+ * @head: linked list
+ *
+ * Return: pointer to first node of reversed list
+ */
+dir_list_t *reverse_dir_list(dir_list_t **head)
+{
+	dir_list_t *current, *prev;
+
+	current = *head;
+	prev = NULL;
+	while (current != NULL)
+	{
+		*head = current->next;
+		current->next = prev;
+		prev = current;
+		current = *head;
+	}
+	*head = prev;
+	return (*head);
 }
