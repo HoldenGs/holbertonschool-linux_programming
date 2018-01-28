@@ -12,14 +12,14 @@
 int main(int argc, char **argv)
 {
 	struct dirent *read;
-	char dir[400], error_message[400], format, hidden, sort;
+	char dir[400], error_message[400], format, hidden, sort, reverse;
 	int i, j, dir_count, max_src_bytes = 397;
 	dir_list_t *dir_list, *dir_head;
 	file_list_t *file_list;
 	DIR *dirp;
 	int errno;
 
-	format = ' ';
+	format = reverse = ' ';
 	hidden = ' ';
 	sort = ' ';
 	dir_count = 0;
@@ -46,6 +46,8 @@ int main(int argc, char **argv)
 					sort = 'S';
 				else if (argv[i][j] == 't')
 					sort = 't';
+				if (argv[i][j] == 'r')
+					reverse = 'r';
 			}
 		}
 		else
@@ -103,6 +105,9 @@ int main(int argc, char **argv)
 			cocktail_sort_by_int(&file_list);
 		else
 			cocktail_sort_by_name(&file_list);
+
+		if (reverse == 'r')
+			reverse_file_list(&file_list);
 
 
 		print_ls(format, dir_list, file_list);

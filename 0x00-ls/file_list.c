@@ -147,3 +147,27 @@ file_list_t *add_node(file_list_t **h, file_list_t *w, struct dirent *file)
 	}
 	return (new);
 }
+
+
+
+/**
+ * reverse_listint - reverse a linked list
+ *
+ * @head: linked list
+ */
+void reverse_file_list(file_list_t **head)
+{
+	file_list_t *current, *tmp;
+
+	current = *head;
+	tmp = NULL;
+	while (current != NULL)
+	{
+		tmp = current->prev;
+		current->prev = current->next;
+		current->next = tmp;
+		current = current->prev;
+	}
+	if (tmp != NULL)
+		*head = tmp->prev;
+}

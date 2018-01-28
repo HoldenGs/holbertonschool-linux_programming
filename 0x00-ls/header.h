@@ -63,6 +63,7 @@ file_list_t *add_file_node(file_list_t **head, struct dirent *, char, dir_list_t
 void free_file_list(file_list_t **head);
 file_list_t *insert_file_node_at_index(file_list_t **h, unsigned int idx, struct dirent *);
 file_list_t *add_node(file_list_t **h, file_list_t *w, struct dirent *);
+void reverse_file_list(file_list_t **);
 
 /* sort_file_list.c */
 void cocktail_sort_by_name(file_list_t **list);
