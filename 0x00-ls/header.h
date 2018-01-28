@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <locale.h>
+#include <pwd.h>
+#include <grp.h>
 
 
 /**

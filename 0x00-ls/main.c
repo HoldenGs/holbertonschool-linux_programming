@@ -123,7 +123,7 @@ int main(int argc, char **argv)
 int print_ls(char format, dir_list_t *curr_dir, file_list_t *file_node)
 {
 	struct stat *buf;
-	char path[400], dir[400], print[11];
+	char path[400], dir[400], perms[11], *usr, *grp;
 
 	while (file_node != NULL)
 	{
@@ -133,8 +133,10 @@ int print_ls(char format, dir_list_t *curr_dir, file_list_t *file_node)
 			buf = malloc(sizeof(struct stat));
 			strncpy(path, strncat(strcat(strcpy(dir, curr_dir->dir), "/"), file_node->file->d_name, 400 - strlen(curr_dir->dir)), 399);
 			lstat(path, buf);
-			file_perms(buf->st_mode, print);
-			printf("%s ", print);
+			usr = getpwuid(buf->st_uid)->pw_name;
+			grp = getgrgid(buf->st_gid)->gr_name;
+			file_perms(buf->st_mode, perms);
+			printf("%s %i %s %s ", perms, (unsigned)buf->st_nlink, usr, grp);
 			free(buf);
 		}
 		printf("%s", file_node->file->d_name);
@@ -194,21 +196,21 @@ int file_type(mode_t mode)
  * file_perms - add long format file perms from @buf to bits to be printed
  *
  * @mode: file mode information
- * @print: character array to print
+ * @perms: character array to print
  */
-void file_perms(mode_t mode, char print[11])
+void file_perms(mode_t mode, char perms[11])
 {
 	static const char *rwx[] = {"---", "--x", "-w-", "r--", "-wx", "r-x", "rw-", "rwx"};
 
-	print[0] = file_type(mode);
-	strcpy(&print[1], rwx[(mode >> 6) & 7]);
-	strcpy(&print[4], rwx[(mode >> 3) & 7]);
-	strcpy(&print[7], rwx[mode & 7]);
+	perms[0] = file_type(mode);
+	strcpy(&perms[1], rwx[(mode >> 6) & 7]);
+	strcpy(&perms[4], rwx[(mode >> 3) & 7]);
+	strcpy(&perms[7], rwx[mode & 7]);
 	if (mode & S_ISUID)
-		print[1] = (mode & S_IXUSR) ? 's' : 'S';
+		perms[1] = (mode & S_IXUSR) ? 's' : 'S';
 	if (mode & S_ISGID)
-		print[4] = (mode & S_IXGRP) ? 's' : 'l';
+		perms[4] = (mode & S_IXGRP) ? 's' : 'l';
 	if (mode & S_ISVTX)
-		print[7] = (mode & S_IXOTH) ? 't' : 'T';
-	print[10] = '\0';
+		perms[7] = (mode & S_IXOTH) ? 't' : 'T';
+	perms[10] = '\0';
 }
