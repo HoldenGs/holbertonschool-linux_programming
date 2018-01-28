@@ -2,7 +2,7 @@
 
 
 /**
- * append_dir_list - add a new node at the start of a dir_list_t linked list
+ * add_dir_node - add a new node at the start of a dir_list_t linked list
  *
  * @head: start of linked list
  * @dir: directory data to add to node
@@ -19,7 +19,7 @@ dir_list_t *add_dir_node(dir_list_t **head, char dir[400])
 	strncpy(node->dir, dir, 400);
 	node->next = *head;
 	*head = node;
-	return node;
+	return (node);
 }
 
 

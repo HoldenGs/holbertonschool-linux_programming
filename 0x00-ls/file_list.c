@@ -2,27 +2,27 @@
 
 
 /**
- * add_file_list - add a new node at the start of a file_list_t linked list
+ * add_file_node - add a new node at the start of a file_list_t linked list
  *
  * @head: start of linked list
  * @file: file data to add to node
  *
  * Return: address of new node; NULL if failure
  */
-file_list_t *add_file_node(file_list_t **head, const char file[256])
+file_list_t *add_file_node(file_list_t **head, struct dirent *file)
 {
 	file_list_t *node;
 
 	node = malloc(sizeof(file_list_t));
 	if (node == NULL)
 		return (NULL);
-	strcpy(node->file, file);
+	node->file = file;
 	node->next = *head;
 	node->prev = NULL;
 	if (*head != NULL)
 		(*head)->prev = node;
 	*head = node;
-	return node;
+	return (node);
 }
 
 
@@ -59,7 +59,7 @@ void free_file_list(file_list_t **head)
  *
  * Return: new node; NULL if failure
  */
-file_list_t *insert_file_node_at_index(file_list_t **h, unsigned int idx, const char file[256])
+file_list_t *insert_file_node_at_index(file_list_t **h, unsigned int idx, struct dirent *file)
 {
 	file_list_t *walk, *new;
 	unsigned int i;
@@ -74,7 +74,7 @@ file_list_t *insert_file_node_at_index(file_list_t **h, unsigned int idx, const 
 				new = malloc(sizeof(file_list_t));
 				if (new == NULL)
 					return (NULL);
-				strcpy(new->file, file);
+				new->file = file;
 				new->next = walk;
 				new->prev = walk->prev;
 				if (walk->prev != NULL)
@@ -93,7 +93,7 @@ file_list_t *insert_file_node_at_index(file_list_t **h, unsigned int idx, const 
 	}
 	if (i == idx)
 		return (add_node(h, walk, file));
-	return NULL;
+	return (NULL);
 }
 
 
@@ -106,7 +106,7 @@ file_list_t *insert_file_node_at_index(file_list_t **h, unsigned int idx, const 
  *
  * Return: new node; NULL if failure
  */
-file_list_t *add_node(file_list_t **h, file_list_t *w, const char file[256])
+file_list_t *add_node(file_list_t **h, file_list_t *w, struct dirent *file)
 {
 
 	file_list_t *new, *walk;
@@ -115,7 +115,7 @@ file_list_t *add_node(file_list_t **h, file_list_t *w, const char file[256])
 	new = malloc(sizeof(file_list_t));
 	if (new == NULL)
 		return (NULL);
-	strcpy(new->file, file);
+	new->file = file;
 	new->next = NULL;
 	if (*h != NULL)
 	{
@@ -131,5 +131,5 @@ file_list_t *add_node(file_list_t **h, file_list_t *w, const char file[256])
 		*h = new;
 		new->prev = NULL;
 	}
-	return new;
+	return (new);
 }

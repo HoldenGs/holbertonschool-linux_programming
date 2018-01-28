@@ -58,6 +58,7 @@ int main(int argc, char **argv)
 	{
 		dir_list = add_dir_node(&dir_list, dir);
 		dir_list->next = NULL;
+		dir_count++;
 	}
 
 	dir_list = reverse_dir_list(&dir_list);
@@ -77,21 +78,26 @@ int main(int argc, char **argv)
 
 
 		while ((read = readdir(dirp)) != NULL)
-			file_list = add_file_node(&file_list, read->d_name);
+		{
+			switch (hidden)
+			{
+				case 'a':
+					file_list = add_file_node(&file_list, read);
+					break;
+				case 'A':
+					if (strcmp(read->d_name, ".") != 0 && strcmp(read->d_name, "..") != 0)
+						file_list = add_file_node(&file_list, read);
+					break;
+				case ' ':
+					if (read->d_name[0] != '.')
+						file_list = add_file_node(&file_list, read);
+					break;
+			}
+		}
 		cocktail_sort_list(&file_list);
 
+		print_ls(format, dir_list, file_list);
 
-		switch (format)
-		{
-			case '1':
-				print_ls(hidden, '\n', NULL, file_list);
-				break;
-			case 'l':
-				print_ls(hidden, '\n', dir_list, file_list);
-				break;
-			default:
-				print_ls(hidden, '\t', NULL, file_list); 
-		}
 		if (dir_list->next != NULL)
 			putchar('\n');
 
@@ -101,53 +107,108 @@ int main(int argc, char **argv)
 	}
 
 	free_dir_list(&dir_head);
-	return 0;
+	return (0);
 }
 
 
 /**
  * print_ls - print contents in the default ls format, i.e. columns
  *
- * @hidden: parameter denoting the option for revealing hidden files
  * @format: printing format parameter
  * @curr_dir: current directory to be printed
- * @file_list: pointer to the directory data
+ * @file_node: struct for the file data
  *
  * Return: 0 for success, 1 for failure
  */
-int print_ls(char hidden, char format, dir_list_t *curr_dir, file_list_t *file_list)
+int print_ls(char format, dir_list_t *curr_dir, file_list_t *file_node)
 {
-	while (file_list != NULL)
-	{
-		if (hidden == 'a')
-		{
-			printf("%s", file_list->file);
-			if (file_list->next != NULL)
-				putchar(format);
-		}
-		else if (hidden == 'A')
-		{
-			if (strcoll(file_list->file, ".") != 0 &&
-				strcoll(file_list->file, "..") != 0)
-			{
-				printf("%s", file_list->file);
-				if (file_list->next != NULL)
-					putchar(format);
-			}
-		}
-		else
-		{
-			if (file_list->file[0] != '.')
-			{
-				printf("%s", file_list->file);
-				if (file_list->next != NULL)
-					putchar(format);
-			}
-		}
-		file_list = file_list->next;
-	}
-	if (format == '\t')
-		printf("\n");
+	struct stat *buf;
+	char path[400], dir[400], print[11];
 
-	return 0;
+	while (file_node != NULL)
+	{
+		buf = NULL;
+		if (format == 'l')
+		{
+			buf = malloc(sizeof(struct stat));
+			strncpy(path, strncat(strcat(strcpy(dir, curr_dir->dir), "/"), file_node->file->d_name, 400 - strlen(curr_dir->dir)), 399);
+			lstat(path, buf);
+			file_perms(buf->st_mode, print);
+			printf("%s ", print);
+			free(buf);
+		}
+		printf("%s", file_node->file->d_name);
+		if (file_node->next != NULL)
+		{
+			switch (format)
+			{
+				case 'l':
+					putchar('\n');
+					break;
+				case '1':
+					putchar('\n');
+					break;
+				default:
+					putchar('\t');
+			}
+		}
+		file_node = file_node->next;
+	}
+	putchar('\n');
+
+	return (0);
+}
+
+
+/**
+ * file_type - get long format file type
+ *
+ * @mode: file mode information
+ *
+ * Return: character corresponding to file type
+ */
+int file_type(mode_t mode)
+{
+	int c;
+
+	if (S_ISREG(mode))
+			c = '-';
+	else if (S_ISDIR(mode))
+			c = 'd';
+	else if (S_ISLNK(mode))
+			c = 'l';
+	else if (S_ISSOCK(mode))
+			c = 's';
+	else if (S_ISBLK(mode))
+			c = 'b';
+	else if (S_ISCHR(mode))
+			c = 'c';
+	else if (S_ISFIFO(mode))
+			c = 'p';
+
+	return (c);
+}
+
+
+/**
+ * file_perms - add long format file perms from @buf to bits to be printed
+ *
+ * @mode: file mode information
+ * @print: character array to print
+ */
+void file_perms(mode_t mode, char print[11])
+{
+	static const char *rwx[] = {"---", "--x", "-w-", "r--", "-wx", "r-x", "rw-", "rwx"};
+
+	print[0] = file_type(mode);
+	strcpy(&print[1], rwx[(mode >> 6) & 7]);
+	strcpy(&print[4], rwx[(mode >> 3) & 7]);
+	strcpy(&print[7], rwx[mode & 7]);
+	if (mode & S_ISUID)
+		print[1] = (mode & S_IXUSR) ? 's' : 'S';
+	if (mode & S_ISGID)
+		print[4] = (mode & S_IXGRP) ? 's' : 'l';
+	if (mode & S_ISVTX)
+		print[7] = (mode & S_IXOTH) ? 't' : 'T';
+	print[10] = '\0';
 }
