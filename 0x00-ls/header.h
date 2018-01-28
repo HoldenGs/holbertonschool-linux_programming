@@ -13,6 +13,7 @@
 #include <locale.h>
 #include <pwd.h>
 #include <grp.h>
+#include <time.h>
 
 
 /**
@@ -41,6 +42,7 @@ typedef struct file_list_s
 {
 	struct file_list_s *prev;
 	struct dirent *file;
+	int sort_int;
 	struct file_list_s *next;
 } file_list_t;
 
@@ -57,13 +59,14 @@ void free_dir_list(dir_list_t **);
 dir_list_t *reverse_dir_list(dir_list_t **head);
 
 /* file_list.c */
-file_list_t *add_file_node(file_list_t **head, struct dirent *);
+file_list_t *add_file_node(file_list_t **head, struct dirent *, char, dir_list_t *);
 void free_file_list(file_list_t **head);
 file_list_t *insert_file_node_at_index(file_list_t **h, unsigned int idx, struct dirent *);
 file_list_t *add_node(file_list_t **h, file_list_t *w, struct dirent *);
 
 /* sort_file_list.c */
-void cocktail_sort_list(file_list_t **list);
+void cocktail_sort_by_name(file_list_t **list);
+void cocktail_sort_by_int(file_list_t **list);
 void swap(file_list_t **list, file_list_t *to_swap, file_list_t *compare);
 
 

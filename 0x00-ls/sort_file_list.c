@@ -44,11 +44,11 @@ void swap(file_list_t **list, file_list_t *to_swap, file_list_t *compare)
 
 
 /**
- * cocktail_sort_list - sort with cocktail sort algorithm
+ * cocktail_sort_by_name - sort with cocktail sort algorithm
  *
  * @list: doubly linked list of int
  */
-void cocktail_sort_list(file_list_t **list)
+void cocktail_sort_by_name(file_list_t **list)
 {
 	int swapped;
 	file_list_t *cursor;
@@ -75,6 +75,50 @@ void cocktail_sort_list(file_list_t **list)
 		while (cursor->prev)
 		{
 			if (strcoll(cursor->file->d_name, (cursor->prev)->file->d_name) < 0)
+			{
+				swap(list, cursor, cursor->prev);
+				++swapped;
+			}
+			else
+			{
+			cursor = cursor->prev;
+			}
+		}
+	}
+}
+
+/**
+ * cocktail_sort_by_int - sort with cocktail sort algorithm
+ *
+ * @list: doubly linked list of int
+ */
+void cocktail_sort_by_int(file_list_t **list)
+{
+	int swapped;
+	file_list_t *cursor;
+
+	if (!list || !*list)
+		return;
+	swapped = 1;
+	cursor = *list;
+	while (swapped)
+	{
+		swapped = 0;
+		while (cursor->next)
+		{
+			if (cursor->sort_int > (cursor->next)->sort_int)
+			{
+				swap(list, cursor->next, cursor);
+				++swapped;
+			}
+			else
+			{
+			cursor = cursor->next;
+			}
+		}
+		while (cursor->prev)
+		{
+			if (cursor->sort_int < (cursor->prev)->sort_int)
 			{
 				swap(list, cursor, cursor->prev);
 				++swapped;

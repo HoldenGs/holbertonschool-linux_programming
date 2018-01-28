@@ -6,16 +6,30 @@
  *
  * @head: start of linked list
  * @file: file data to add to node
+ * @sort: integer value to sort by
  *
  * Return: address of new node; NULL if failure
  */
-file_list_t *add_file_node(file_list_t **head, struct dirent *file)
+file_list_t *add_file_node(file_list_t **head, struct dirent *file, char sort, dir_list_t *curr_dir)
 {
 	file_list_t *node;
+	struct stat *buf;
+	char path[400], dir[400];
 
 	node = malloc(sizeof(file_list_t));
 	if (node == NULL)
 		return (NULL);
+	if (sort != ' ')
+	{
+		buf = malloc(sizeof(struct stat));
+		strncpy(path, strncat(strcat(strcpy(dir, curr_dir->dir), "/"), file->d_name, 400 - strlen(curr_dir->dir)), 399);
+		lstat(path, buf);
+		if (sort == 'S')
+			node->sort_int = (int)buf->st_size;
+		else if (sort == 't')
+			node->sort_int = (int)buf->st_ctime;
+		free(buf);
+	}
 	node->file = file;
 	node->next = *head;
 	node->prev = NULL;

@@ -12,7 +12,7 @@
 int main(int argc, char **argv)
 {
 	struct dirent *read;
-	char dir[400], error_message[400], format, hidden;
+	char dir[400], error_message[400], format, hidden, sort;
 	int i, j, dir_count, max_src_bytes = 397;
 	dir_list_t *dir_list, *dir_head;
 	file_list_t *file_list;
@@ -21,6 +21,7 @@ int main(int argc, char **argv)
 
 	format = ' ';
 	hidden = ' ';
+	sort = ' ';
 	dir_count = 0;
 	file_list = NULL;
 	dir_list = NULL;
@@ -41,6 +42,10 @@ int main(int argc, char **argv)
 					hidden = 'a';
 				else if (argv[i][j] == 'A')
 					hidden = 'A';
+				if (argv[i][j] == 'S')
+					sort = 'S';
+				else if (argv[i][j] == 't')
+					sort = 't';
 			}
 		}
 		else
@@ -82,19 +87,23 @@ int main(int argc, char **argv)
 			switch (hidden)
 			{
 				case 'a':
-					file_list = add_file_node(&file_list, read);
+					file_list = add_file_node(&file_list, read, sort, dir_list);
 					break;
 				case 'A':
 					if (strcmp(read->d_name, ".") != 0 && strcmp(read->d_name, "..") != 0)
-						file_list = add_file_node(&file_list, read);
+						file_list = add_file_node(&file_list, read, sort, dir_list);
 					break;
 				case ' ':
 					if (read->d_name[0] != '.')
-						file_list = add_file_node(&file_list, read);
+						file_list = add_file_node(&file_list, read, sort, dir_list);
 					break;
 			}
 		}
-		cocktail_sort_list(&file_list);
+		if (sort == 'S' || sort == 't')
+			cocktail_sort_by_int(&file_list);
+		else
+			cocktail_sort_by_name(&file_list);
+
 
 		print_ls(format, dir_list, file_list);
 
@@ -123,7 +132,7 @@ int main(int argc, char **argv)
 int print_ls(char format, dir_list_t *curr_dir, file_list_t *file_node)
 {
 	struct stat *buf;
-	char path[400], dir[400], perms[11], *usr, *grp;
+	char path[400], dir[400], perms[11], *usr, *grp, *_time;
 
 	while (file_node != NULL)
 	{
@@ -135,8 +144,10 @@ int print_ls(char format, dir_list_t *curr_dir, file_list_t *file_node)
 			lstat(path, buf);
 			usr = getpwuid(buf->st_uid)->pw_name;
 			grp = getgrgid(buf->st_gid)->gr_name;
+			_time = ctime(&(buf->st_ctime));
+			_time[strlen(_time) - 1] = '\0';
 			file_perms(buf->st_mode, perms);
-			printf("%s %i %s %s ", perms, (unsigned)buf->st_nlink, usr, grp);
+			printf("%s %2i %s %s %5i %s ", perms, (unsigned)buf->st_nlink, usr, grp, (unsigned)buf->st_size, _time);
 			free(buf);
 		}
 		printf("%s", file_node->file->d_name);
