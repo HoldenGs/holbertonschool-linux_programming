@@ -7,6 +7,7 @@
  * @head: start of linked list
  * @file: file data to add to node
  * @sort: integer value to sort by
+ * @curr_dir: current directory for lstat usage
  *
  * Return: address of new node; NULL if failure
  */
@@ -151,7 +152,7 @@ file_list_t *add_node(file_list_t **h, file_list_t *w, struct dirent *file)
 
 
 /**
- * reverse_listint - reverse a linked list
+ * reverse_file_list - reverse a linked list
  *
  * @head: linked list
  */

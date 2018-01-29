@@ -90,6 +90,7 @@ int main(int argc, char **argv)
 int print_files(char format, char *curr_dir, file_list_t *file_node)
 {
 	struct stat *buf;
+	unsigned int links, size;
 	char path[400], dir[400], perms[11], *usr, *grp, *_time;
 
 	while (file_node != NULL)
@@ -104,8 +105,10 @@ int print_files(char format, char *curr_dir, file_list_t *file_node)
 			grp = getgrgid(buf->st_gid)->gr_name;
 			_time = ctime(&(buf->st_ctime));
 			_time[strlen(_time) - 1] = '\0';
+			links = (unsigned int)buf->nlink;
+			size = (unsigned int)buf->st_size;
 			file_perms(buf->st_mode, perms);
-			printf("%s %2i %s %s %5i %s ", perms, (unsigned)buf->st_nlink, usr, grp, (unsigned)buf->st_size, _time);
+			printf("%s %2i %s %s %5i %s ", perms, links, usr, grp, size, _time);
 			free(buf);
 		}
 		printf("%s", file_node->file->d_name);
@@ -125,9 +128,7 @@ int print_files(char format, char *curr_dir, file_list_t *file_node)
 		}
 		file_node = file_node->next;
 	}
-
 	putchar('\n');
-
 	return (0);
 }
 
@@ -135,7 +136,13 @@ int print_files(char format, char *curr_dir, file_list_t *file_node)
 /**
  * ls - lists all files in the specified directory
  *
- * @
+ * @dir_name: name of current directory to ls
+ * @format: format option
+ * @hidden: hidden option
+ * @reverse: reverse option
+ * @recurse: recurse option
+ * @sort: sorting option
+ * @dir_count:
  *
  * Return: 0 for success, other numbers for failure
  */
@@ -191,8 +198,8 @@ int ls(char *dir_name, char format, char hidden, char reverse, char recurse, cha
 	if (dir_count > 1 || recurse == 'R')
 		printf("%s:\n", dir_name);
 	print_files(format, dir_name, file_list);
-
-	putchar('\n');
+	if (dir_count > 1 || recurse == 'R')
+		putchar('\n');
 
 	free_file_list(&file_list);
 	closedir(dirp);
@@ -212,19 +219,19 @@ int file_type(mode_t mode)
 	int c;
 
 	if (S_ISREG(mode))
-			c = '-';
+		c = '-';
 	else if (S_ISDIR(mode))
-			c = 'd';
+		c = 'd';
 	else if (S_ISLNK(mode))
-			c = 'l';
+		c = 'l';
 	else if (S_ISSOCK(mode))
-			c = 's';
+		c = 's';
 	else if (S_ISBLK(mode))
-			c = 'b';
+		c = 'b';
 	else if (S_ISCHR(mode))
-			c = 'c';
+		c = 'c';
 	else if (S_ISFIFO(mode))
-			c = 'p';
+		c = 'p';
 
 	return (c);
 }
