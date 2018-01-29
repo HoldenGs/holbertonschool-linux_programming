@@ -11,19 +11,14 @@
  */
 int main(int argc, char **argv)
 {
-	struct dirent *read;
-	char dir[400], error_message[400], format, hidden, sort, reverse;
-	int i, j, dir_count, max_src_bytes = 397;
+	char dir[400], format, hidden, sort, reverse, recurse;
+	int i, j, r, errno, dir_count, max_src_bytes = 397;
 	dir_list_t *dir_list, *dir_head;
-	file_list_t *file_list;
-	DIR *dirp;
-	int errno;
 
-	format = reverse = ' ';
+	format = reverse = recurse = ' ';
 	hidden = ' ';
 	sort = ' ';
-	dir_count = 0;
-	file_list = NULL;
+	dir_count = r = 0;
 	dir_list = NULL;
 	setlocale(LC_ALL, "");
 
@@ -48,6 +43,8 @@ int main(int argc, char **argv)
 					sort = 't';
 				if (argv[i][j] == 'r')
 					reverse = 'r';
+				if (argv[i][j] == 'R')
+					recurse = 'R';
 			}
 		}
 		else
@@ -72,61 +69,17 @@ int main(int argc, char **argv)
 	dir_head = dir_list;
 	while (dir_list != NULL)
 	{
-		dirp = opendir(dir_list->dir);
-		if (dirp == NULL)
-		{
-			strcpy(error_message, "hls: cannot access ");
-			max_src_bytes = 381;
-			perror(strncat(error_message, dir_list->dir, max_src_bytes));
-			return (errno);
-		}
-		if (dir_count > 1)
-			printf("%s:\n", dir_list->dir);
-
-
-		while ((read = readdir(dirp)) != NULL)
-		{
-			switch (hidden)
-			{
-				case 'a':
-					file_list = add_file_node(&file_list, read, sort, dir_list);
-					break;
-				case 'A':
-					if (strcmp(read->d_name, ".") != 0 && strcmp(read->d_name, "..") != 0)
-						file_list = add_file_node(&file_list, read, sort, dir_list);
-					break;
-				case ' ':
-					if (read->d_name[0] != '.')
-						file_list = add_file_node(&file_list, read, sort, dir_list);
-					break;
-			}
-		}
-		if (sort == 'S' || sort == 't')
-			cocktail_sort_by_int(&file_list);
-		else
-			cocktail_sort_by_name(&file_list);
-
-		if (reverse == 'r')
-			reverse_file_list(&file_list);
-
-
-		print_ls(format, dir_list, file_list);
-
-		if (dir_list->next != NULL)
-			putchar('\n');
-
-		free_file_list(&file_list);
-		closedir(dirp);
+		r = ls(dir_list->dir, format, hidden, reverse, recurse, sort, dir_count);
 		dir_list = dir_list->next;
 	}
 
 	free_dir_list(&dir_head);
-	return (0);
+	return (r);
 }
 
 
 /**
- * print_ls - print contents in the default ls format, i.e. columns
+ * print_files - print contents in the default ls format, i.e. columns
  *
  * @format: printing format parameter
  * @curr_dir: current directory to be printed
@@ -134,7 +87,7 @@ int main(int argc, char **argv)
  *
  * Return: 0 for success, 1 for failure
  */
-int print_ls(char format, dir_list_t *curr_dir, file_list_t *file_node)
+int print_files(char format, char *curr_dir, file_list_t *file_node)
 {
 	struct stat *buf;
 	char path[400], dir[400], perms[11], *usr, *grp, *_time;
@@ -145,7 +98,7 @@ int print_ls(char format, dir_list_t *curr_dir, file_list_t *file_node)
 		if (format == 'l')
 		{
 			buf = malloc(sizeof(struct stat));
-			strncpy(path, strncat(strcat(strcpy(dir, curr_dir->dir), "/"), file_node->file->d_name, 400 - strlen(curr_dir->dir)), 399);
+			strncpy(path, strncat(strcat(strcpy(dir, curr_dir), "/"), file_node->file->d_name, 400 - strlen(curr_dir)), 399);
 			lstat(path, buf);
 			usr = getpwuid(buf->st_uid)->pw_name;
 			grp = getgrgid(buf->st_gid)->gr_name;
@@ -172,9 +125,78 @@ int print_ls(char format, dir_list_t *curr_dir, file_list_t *file_node)
 		}
 		file_node = file_node->next;
 	}
+
 	putchar('\n');
 
 	return (0);
+}
+
+
+/**
+ * ls - lists all files in the specified directory
+ *
+ * @
+ *
+ * Return: 0 for success, other numbers for failure
+ */
+int ls(char *dir_name, char format, char hidden, char reverse, char recurse, char sort, int dir_count)
+{
+	struct dirent *read;
+	char error_message[400];
+	int errno, r, max_src_bytes = 397;
+	file_list_t *file_list;
+	DIR *dirp;
+
+	r = 0;
+	file_list = NULL;
+
+	dirp = opendir(dir_name);
+	if (dirp == NULL)
+	{
+		strcpy(error_message, "hls: cannot access ");
+		max_src_bytes = 381;
+		perror(strncat(error_message, dir_name, max_src_bytes));
+		return (errno);
+	}
+
+
+	while ((read = readdir(dirp)) != NULL)
+	{
+		if (recurse == 'R' && read->d_type & DT_DIR && (strcmp(read->d_name, ".") != 0 && strcmp(read->d_name, "..") != 0))
+			ls(read->d_name, format, hidden, reverse, recurse, sort, dir_count);
+		switch (hidden)
+		{
+			case 'a':
+				file_list = add_file_node(&file_list, read, sort, dir_name);
+				break;
+			case 'A':
+				if (strcmp(read->d_name, ".") != 0 && strcmp(read->d_name, "..") != 0)
+					file_list = add_file_node(&file_list, read, sort, dir_name);
+				break;
+			case ' ':
+				if (read->d_name[0] != '.')
+					file_list = add_file_node(&file_list, read, sort, dir_name);
+				break;
+		}
+	}
+	if (sort == 'S' || sort == 't')
+		cocktail_sort_by_int(&file_list);
+	else
+		cocktail_sort_by_name(&file_list);
+
+	if (reverse == 'r')
+		reverse_file_list(&file_list);
+
+
+	if (dir_count > 1 || recurse == 'R')
+		printf("%s:\n", dir_name);
+	print_files(format, dir_name, file_list);
+
+	putchar('\n');
+
+	free_file_list(&file_list);
+	closedir(dirp);
+	return (r);
 }
 
 

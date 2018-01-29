@@ -10,7 +10,7 @@
  *
  * Return: address of new node; NULL if failure
  */
-file_list_t *add_file_node(file_list_t **head, struct dirent *file, char sort, dir_list_t *curr_dir)
+file_list_t *add_file_node(file_list_t **head, struct dirent *file, char sort, char *curr_dir)
 {
 	file_list_t *node;
 	struct stat *buf;
@@ -22,7 +22,7 @@ file_list_t *add_file_node(file_list_t **head, struct dirent *file, char sort, d
 	if (sort != ' ')
 	{
 		buf = malloc(sizeof(struct stat));
-		strncpy(path, strncat(strcat(strcpy(dir, curr_dir->dir), "/"), file->d_name, 400 - strlen(curr_dir->dir)), 399);
+		strncpy(path, strncat(strcat(strcpy(dir, curr_dir), "/"), file->d_name, 400 - strlen(curr_dir)), 399);
 		lstat(path, buf);
 		if (sort == 'S')
 			node->sort_int = (int)buf->st_size;
