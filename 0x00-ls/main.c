@@ -105,7 +105,7 @@ int print_files(char format, char *curr_dir, file_list_t *file_node)
 			grp = getgrgid(buf->st_gid)->gr_name;
 			_time = ctime(&(buf->st_ctime));
 			_time[strlen(_time) - 1] = '\0';
-			links = (unsigned int)buf->nlink;
+			links = (unsigned int)buf->st_nlink;
 			size = (unsigned int)buf->st_size;
 			file_perms(buf->st_mode, perms);
 			printf("%s %2i %s %s %5i %s ", perms, links, usr, grp, size, _time);
