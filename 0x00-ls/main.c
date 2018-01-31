@@ -11,7 +11,7 @@
  */
 int main(int argc, char **argv)
 {
-	char dir[400], format, hidden, sort, reverse, recurse;
+	char dir[400], *path, format, hidden, sort, reverse, recurse;
 	int i, j, r, errno, dir_count, max_src_bytes = 397;
 	dir_list_t *dir_list, *dir_head;
 
@@ -20,6 +20,7 @@ int main(int argc, char **argv)
 	sort = ' ';
 	dir_count = r = 0;
 	dir_list = NULL;
+	path = NULL;
 	setlocale(LC_ALL, "");
 
 	strcpy(dir, ".");
@@ -69,7 +70,7 @@ int main(int argc, char **argv)
 	dir_head = dir_list;
 	while (dir_list != NULL)
 	{
-		r = ls(dir_list->dir, format, hidden, reverse, recurse, sort, dir_count);
+		r = ls(dir_list->dir, path, format, hidden, reverse, recurse, sort, dir_count);
 		dir_list = dir_list->next;
 	}
 
@@ -105,7 +106,7 @@ int print_files(char format, char *curr_dir, file_list_t *file_node)
 			grp = getgrgid(buf->st_gid)->gr_name;
 			_time = ctime(&(buf->st_ctime));
 			_time[strlen(_time) - 1] = '\0';
-			links = (unsigned int)buf->nlink;
+			links = (unsigned int)buf->st_nlink;
 			size = (unsigned int)buf->st_size;
 			file_perms(buf->st_mode, perms);
 			printf("%s %2i %s %s %5i %s ", perms, links, usr, grp, size, _time);
@@ -137,6 +138,7 @@ int print_files(char format, char *curr_dir, file_list_t *file_node)
  * ls - lists all files in the specified directory
  *
  * @dir_name: name of current directory to ls
+ * @path: path to file
  * @format: format option
  * @hidden: hidden option
  * @reverse: reverse option
@@ -146,7 +148,7 @@ int print_files(char format, char *curr_dir, file_list_t *file_node)
  *
  * Return: 0 for success, other numbers for failure
  */
-int ls(char *dir_name, char format, char hidden, char reverse, char recurse, char sort, int dir_count)
+int ls(char *dir_name, char *path, char format, char hidden, char reverse, char recurse, char sort, int dir_count)
 {
 	struct dirent *read;
 	char error_message[400];
@@ -157,20 +159,27 @@ int ls(char *dir_name, char format, char hidden, char reverse, char recurse, cha
 	r = 0;
 	file_list = NULL;
 
-	dirp = opendir(dir_name);
+	if (path == NULL)
+		path = dir_name;
+	else
+	{
+		if (path[strlen(path) - 1] != '/')
+			path = strcat(path, "/");
+		strncat(path, dir_name, 400 - strlen(path));
+	}
+	dirp = opendir(path);
 	if (dirp == NULL)
 	{
 		strcpy(error_message, "hls: cannot access ");
 		max_src_bytes = 381;
-		perror(strncat(error_message, dir_name, max_src_bytes));
+		perror(strncat(error_message, path, max_src_bytes));
 		return (errno);
 	}
-
 
 	while ((read = readdir(dirp)) != NULL)
 	{
 		if (recurse == 'R' && read->d_type & DT_DIR && (strcmp(read->d_name, ".") != 0 && strcmp(read->d_name, "..") != 0))
-			ls(read->d_name, format, hidden, reverse, recurse, sort, dir_count);
+			ls(read->d_name, path, format, hidden, reverse, recurse, sort, dir_count);
 		switch (hidden)
 		{
 			case 'a':
@@ -178,7 +187,7 @@ int ls(char *dir_name, char format, char hidden, char reverse, char recurse, cha
 				break;
 			case 'A':
 				if (strcmp(read->d_name, ".") != 0 && strcmp(read->d_name, "..") != 0)
-					file_list = add_file_node(&file_list, read, sort, dir_name);
+				file_list = add_file_node(&file_list, read, sort, dir_name);
 				break;
 			case ' ':
 				if (read->d_name[0] != '.')
@@ -238,7 +247,7 @@ int file_type(mode_t mode)
 
 
 /**
- * file_perms - add long format file perms from @buf to bits to be printed
+ * file_perms - add long format file perms from @buf to perms array
  *
  * @mode: file mode information
  * @perms: character array to print

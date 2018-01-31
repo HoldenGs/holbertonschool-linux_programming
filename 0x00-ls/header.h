@@ -52,7 +52,7 @@ int main(int, char **);
 int print_files(char, char *, file_list_t *);
 int file_type(mode_t);
 void file_perms(mode_t, char[11]);
-int ls(char *, char, char, char, char, char, int);
+int ls(char *, char *, char, char, char, char, char, int);
 
 /* dir_list.c */
 dir_list_t *add_dir_node(dir_list_t **, char[400]);
