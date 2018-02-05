@@ -20,6 +20,7 @@ int main(int argc, char **argv)
 	sort = ' ';
 	dir_count = r = 0;
 	dir_list = NULL;
+	setlocale(LC_ALL, "");
 
 	strcpy(dir, ".");
 	for (i = 1; i < argc; i++)
