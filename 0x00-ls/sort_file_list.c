@@ -74,7 +74,7 @@ void cocktail_sort_by_name(file_list_t **list)
 		}
 		while (cursor->prev)
 		{
-			if (strcoll(cursor->file->d_name, (cursor->prev)->file->d_name) < 0)
+			if (strcmp(cursor->file->d_name, (cursor->prev)->file->d_name) < 0)
 			{
 				swap(list, cursor, cursor->prev);
 				++swapped;
