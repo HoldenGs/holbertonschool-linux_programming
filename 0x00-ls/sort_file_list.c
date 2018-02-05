@@ -62,7 +62,7 @@ void cocktail_sort_by_name(file_list_t **list)
 		swapped = 0;
 		while (cursor->next)
 		{
-			if (strcmp(cursor->file->d_name, (cursor->next)->file->d_name) > 0)
+			if (strcoll(cursor->file->d_name, (cursor->next)->file->d_name) > 0)
 			{
 				swap(list, cursor->next, cursor);
 				++swapped;
@@ -74,7 +74,7 @@ void cocktail_sort_by_name(file_list_t **list)
 		}
 		while (cursor->prev)
 		{
-			if (strcmp(cursor->file->d_name, (cursor->prev)->file->d_name) < 0)
+			if (strcoll(cursor->file->d_name, (cursor->prev)->file->d_name) < 0)
 			{
 				swap(list, cursor, cursor->prev);
 				++swapped;
