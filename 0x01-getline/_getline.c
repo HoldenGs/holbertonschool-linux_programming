@@ -21,7 +21,7 @@ char *_getline(const int fd)
 	if (check_for_newline(leftover_str, leftover_len) == 0)
 	{
 		buf = malloc(sizeof(char) * (READ_SIZE + leftover_len));
-		bytes_read = read(fd, buf + leftover_len, READ_SIZE);
+		bytes_read = read(fd, buf + leftover_len + 1, READ_SIZE);
 		if (bytes_read < 1)
 		{
 			free(buf);
@@ -31,12 +31,14 @@ char *_getline(const int fd)
 	else
 		buf = malloc(sizeof(char) * (leftover_len));
 	memcpy(buf, leftover_str, leftover_len);
+	buf[leftover_len] = '\0';
 	free(leftover_str);
 
 	/* find the end of the line */
 	for (i = 0; buf[i] != '\n'; i++)
 	{
-		if (i == (READ_SIZE * multiplier) + leftover_len - 1)
+		/* if no newline has been found yet, increase buffer size */
+		if (i == (READ_SIZE * multiplier) + leftover_len)
 		{
 			multiplier++;
 			buf = add_buffer_space(i, buf);
@@ -55,16 +57,50 @@ char *_getline(const int fd)
 	}
 
 	/* return line */
-	line = malloc(sizeof(char) * i + 1);
+	line = malloc(sizeof(char) * (i + 1));
 	memcpy(line, buf, i);
 	line[i] = '\0';
+	line = remove_null_bytes(line, i);
 	leftover_str = strdup(buf + i + 1);
 	free(buf);
 	return (line);
 }
 
 
-/*
+/**
+ * remove_null_bytes - removes all null bytes except the for the last byte
+ *
+ * @line: string to strip
+ *
+ * Return: pointer to string, NULL, on error
+ */
+char *remove_null_bytes(char *line, int len)
+{
+	int i, null_count = 0;
+	char *stripped_line, *new_line;
+
+	stripped_line = malloc(sizeof(char) * (len + 1));
+	memcpy(stripped_line, line, len);
+	stripped_line[len] = '\0';
+	for (i = 0; i < len; i++)
+	{
+		if (line[i] == '\0')
+			null_count++;
+		if (null_count > 0 && i + null_count < len)
+			stripped_line[i] = line[i + null_count];
+		else if (null_count > 0)
+			stripped_line[i] = '\0';
+	}
+	new_line = malloc(sizeof(char) * (i + 2 - null_count));
+	memcpy(new_line, stripped_line, i + 1 - null_count); /* make a new line without extra null bytes at the end */
+	free(line);
+	free(new_line);
+
+	return (stripped_line);
+}
+
+
+/**
  * add_buffer_space - add space to an existing buffer without destroying the information within
  *
  * @old_size: original size of the buffer
@@ -78,12 +114,13 @@ char *add_buffer_space(int old_size, char *buf)
 
 	new_buf = malloc(sizeof(char) * (old_size + READ_SIZE));
 	memcpy(new_buf, buf, old_size);
+	new_buf[old_size] = '\0';
 	free(buf);
 	return (new_buf);
 }
 
 
-/*
+/**
  * check_for_newline - check if there is a newline in the string
  *
  * @buf: string to check
