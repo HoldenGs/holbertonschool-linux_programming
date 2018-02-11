@@ -10,7 +10,18 @@
 #include <string.h>
 
 
+typedef struct fd_list_s
+{
+	char *buf;
+	int bytes_left;
+	int fd;
+	struct fd_list_s *next;
+} fd_list_t;
+
+
 char *_getline(int);
+fd_list_t *prepend_fd(fd_list_t **, int);
+char *_realloc(char *, int);
 char *add_buffer_space(int, char *);
 int check_for_newline(char *, int);
 char *remove_null_bytes(char *, int);

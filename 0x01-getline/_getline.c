@@ -10,60 +10,111 @@
  */
 char *_getline(const int fd)
 {
-	static char *leftover_str;
-	char *buf, *line;
-	int leftover_len = 0, multiplier = 1, i, bytes_read;
+	int line_len, total_bytes_read = 0, fd_found = 0, bytes_read = 0;
+	char *buf, *n_ptr, *line;
+	static fd_list_t *fd_head;
+	fd_list_t *fd_list;
 
-	if (leftover_str != NULL)
-		leftover_len = strlen(leftover_str);
-
-	/* if there's no newline in the leftover string, read into buffer */
-	if (check_for_newline(leftover_str, leftover_len) == 0)
-	{
-		buf = malloc(sizeof(char) * (READ_SIZE + leftover_len));
-		bytes_read = read(fd, buf + leftover_len + 1, READ_SIZE);
-		if (bytes_read < 1)
-		{
-			free(buf);
-			return (NULL);
-		}
-	}
+	buf = NULL;
+	if (fd_head)
+		fd_list = fd_head;
 	else
-		buf = malloc(sizeof(char) * (leftover_len));
-	memcpy(buf, leftover_str, leftover_len);
-	buf[leftover_len] = '\0';
-	free(leftover_str);
-
-	/* find the end of the line */
-	for (i = 0; buf[i] != '\n'; i++)
+		fd_list = NULL;
+	/* check if fd was used before: if so, make the current buffer that fd's buffer */
+	while (fd_list != NULL)
 	{
-		/* if no newline has been found yet, increase buffer size */
-		if (i == (READ_SIZE * multiplier) + leftover_len)
+		if (fd_list->fd == fd)
 		{
-			multiplier++;
-			buf = add_buffer_space(i, buf);
-			if (buf == NULL)
-			{
-				free(buf);
-				return (NULL);
-			}
-			bytes_read = read(fd, buf + i, READ_SIZE);
-			if (bytes_read < 1)
-			{
-				free(buf);
-				return (NULL);
-			}
+			fd_found = 1;
+			buf = fd_list->buf;
+			break;
 		}
+		fd_list = fd_list->next;
+	}
+	/* if fd was not used before, read all of it's contents into a buffer */
+	if (!fd_found)
+	{
+		if (!fd_head)
+		{
+			fd_head = malloc(sizeof(fd_list_t *));
+			fd_head->next = NULL;
+			fd_head->fd = fd;
+			fd_list = fd_head;
+		}
+		else
+			fd_list = prepend_fd(&fd_head, fd);
+		buf = malloc(sizeof(char) * READ_SIZE);
+		while ((bytes_read = read(fd, buf + total_bytes_read, READ_SIZE)) != 0)
+		{
+			if (bytes_read == -1)
+				return (NULL);
+			total_bytes_read += bytes_read;
+			buf = _realloc(buf, total_bytes_read + READ_SIZE);
+		}
+		buf = _realloc(buf, total_bytes_read);
+		fd_list->bytes_left = total_bytes_read;
 	}
 
-	/* return line */
-	line = malloc(sizeof(char) * (i + 1));
-	memcpy(line, buf, i);
-	line[i] = '\0';
-	line = remove_null_bytes(line, i);
-	leftover_str = strdup(buf + i + 1);
-	free(buf);
+	/* get line and move buf to next '\n' position */
+	if (fd_list->bytes_left < 1)
+		return (NULL);
+	n_ptr = memchr(buf, '\n', fd_list->bytes_left);
+	if (n_ptr == NULL)
+		line_len = fd_list->bytes_left + 1;
+	else
+		line_len = (n_ptr - buf) + 1;
+	fd_list->bytes_left -= line_len;
+
+	line = remove_null_bytes(buf, line_len - 1);
+	buf = buf + line_len;
+	fd_list->buf = buf;
+	fd_head = fd_list;
+
 	return (line);
+}
+
+/**
+ * _realloc - reallocate bytes to total_bytes_read length, with extra bytes set to '\0'
+ *
+ * @buf: buffer to reallocate
+ * @new_length: new buffer length
+ *
+ * Return: new buffer
+ */
+char *_realloc(char *buf, int new_length)
+{
+	char *new_buf;
+
+	new_buf = malloc(sizeof(char) * new_length);
+	memset(new_buf, '\0', new_length);
+	memcpy(new_buf, buf, new_length);
+	buf = malloc(sizeof(char) * new_length);
+	memset(buf, '\0', new_length);
+	memcpy(buf, new_buf, new_length);
+	free(new_buf);
+	return (buf);
+}
+
+
+/**
+ * prepend_fd - add a new node at the start of a fd_list_t linked list
+ *
+ * @head: start of linked list
+ * @dir: directory data to add to node
+ *
+ * Return: address of new node; NULL if failure
+ */
+fd_list_t *prepend_fd(fd_list_t **head, int fd)
+{
+	fd_list_t *node;
+
+	node = malloc(sizeof(fd_list_t));
+	if (node == NULL)
+		return (NULL);
+	node->fd = fd;
+	node->next = *head;
+	*head = node;
+	return (node);
 }
 
 
@@ -93,7 +144,6 @@ char *remove_null_bytes(char *line, int len)
 	}
 	new_line = malloc(sizeof(char) * (i + 2 - null_count));
 	memcpy(new_line, stripped_line, i + 1 - null_count); /* make a new line without extra null bytes at the end */
-	free(line);
 	free(new_line);
 
 	return (stripped_line);
