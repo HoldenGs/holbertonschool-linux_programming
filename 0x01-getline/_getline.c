@@ -42,7 +42,10 @@ char *_getline(const int fd)
 			fd_list = fd_head;
 		}
 		else
+		{
 			fd_list = prepend_fd(&fd_head, fd);
+			fd_head = fd_list;
+		}
 		buf = malloc(sizeof(char) * READ_SIZE);
 		while ((bytes_read = read(fd, buf + total_bytes_read, READ_SIZE)) != 0)
 		{
@@ -57,7 +60,12 @@ char *_getline(const int fd)
 
 	/* get line and move buf to next '\n' position */
 	if (fd_list->bytes_left < 1)
+	{
+		fd_head = fd_list->next;
+		free(fd_list);
 		return (NULL);
+	}
+	/* TODO: replace memchr with custom _memchr */
 	n_ptr = memchr(buf, '\n', fd_list->bytes_left);
 	if (n_ptr == NULL)
 		line_len = fd_list->bytes_left + 1;
@@ -68,8 +76,6 @@ char *_getline(const int fd)
 	line = remove_null_bytes(buf, line_len - 1);
 	buf = buf + line_len;
 	fd_list->buf = buf;
-	fd_head = fd_list;
-
 	return (line);
 }
 
