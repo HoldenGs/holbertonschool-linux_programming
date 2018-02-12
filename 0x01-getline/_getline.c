@@ -79,6 +79,28 @@ char *_getline(const int fd)
 	return (line);
 }
 
+
+/**
+ * _memchr - search @len bytes of @buf for char @c
+ *
+ * @buf: buffer to search
+ * @c: character to search for
+ * @len: length of @buf to search in
+ *
+ * Return: pointer to place in @buf where @c was found,
+ * or NULL if not found
+ */
+char *_memchr(char *buf, char c, int len)
+{
+	int i;
+
+	for (i = 0; i < len; i++)
+		if (buf[i] == c)
+			return (buf + i);
+	return (NULL);
+}
+
+
 /**
  * _realloc - reallocate bytes to total_bytes_read length, with extra bytes set to '\0'
  *

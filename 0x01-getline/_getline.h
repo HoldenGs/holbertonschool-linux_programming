@@ -20,6 +20,7 @@ typedef struct fd_list_s
 
 
 char *_getline(int);
+char *_memchr(char *, char, int);
 fd_list_t *prepend_fd(fd_list_t **, int);
 char *_realloc(char *, int);
 char *remove_null_bytes(char *, int);
