@@ -128,7 +128,7 @@ char *_realloc(char *buf, int new_length)
  * prepend_fd - add a new node at the start of a fd_list_t linked list
  *
  * @head: start of linked list
- * @dir: directory data to add to node
+ * @fd: directory data to add to node
  *
  * Return: address of new node; NULL if failure
  */
@@ -150,6 +150,7 @@ fd_list_t *prepend_fd(fd_list_t **head, int fd)
  * remove_null_bytes - removes all null bytes except the for the last byte
  *
  * @line: string to strip
+ * @len: length of line to strip
  *
  * Return: pointer to string, NULL, on error
  */
