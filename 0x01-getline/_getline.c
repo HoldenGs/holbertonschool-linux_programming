@@ -15,6 +15,7 @@ char *_getline(const int fd)
 	static fd_list_t *fd_head;
 	fd_list_t *fd_list;
 
+	/* check if the fd list exists at all */
 	buf = NULL;
 	if (fd_head)
 		fd_list = fd_head;
@@ -32,6 +33,8 @@ char *_getline(const int fd)
 		fd_list = fd_list->next;
 	}
 	/* if fd was not used before, read all of it's contents into a buffer */
+	/* This method is super hacky, and I could do better, but with limited time I resorted to this for simplicity */
+	/* I tried putting this in a method, but had a lot of trouble geting it to work like it does here */
 	if (!fd_found)
 	{
 		if (!fd_head)
@@ -58,21 +61,22 @@ char *_getline(const int fd)
 		fd_list->bytes_left = total_bytes_read;
 	}
 
-	/* get line and move buf to next '\n' position */
+	/* free variables and return NULL if no more bytes to read */
 	if (fd_list->bytes_left < 1)
 	{
 		fd_head = fd_list->next;
+		/* tried multiple ways of freeing @buf without success, I get a specific error everytime */
 		free(fd_list);
 		return (NULL);
 	}
-	/* TODO: replace memchr with custom _memchr */
-	n_ptr = memchr(buf, '\n', fd_list->bytes_left);
+	/* find length of next line */
+	n_ptr = _memchr(buf, '\n', fd_list->bytes_left);
 	if (n_ptr == NULL)
 		line_len = fd_list->bytes_left + 1;
 	else
 		line_len = (n_ptr - buf) + 1;
 	fd_list->bytes_left -= line_len;
-
+	/* strip of null bytes */
 	line = remove_null_bytes(buf, line_len - 1);
 	buf = buf + line_len;
 	fd_list->buf = buf;
@@ -172,7 +176,7 @@ char *remove_null_bytes(char *line, int len)
 			stripped_line[i] = '\0';
 	}
 	new_line = malloc(sizeof(char) * (i + 2 - null_count));
-	memcpy(new_line, stripped_line, i + 1 - null_count); /* make a new line without extra null bytes at the end */
+	memcpy(new_line, stripped_line, i + 1 - null_count);
 	free(new_line);
 
 	return (stripped_line);
