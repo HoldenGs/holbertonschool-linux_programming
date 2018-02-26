@@ -17,6 +17,7 @@ char *_getline(const int fd)
 	static fd_list_t *fd_head;
 	fd_list_t *fd_list;
 
+	/* check if the fd list exists at all */
 	buf = NULL;
 	if (fd_head)
 		fd_list = fd_head;
@@ -34,21 +35,61 @@ char *_getline(const int fd)
 		fd_list = fd_list->next;
 	}
 	/* if fd was not used before, read all of it's contents into a buffer */
+	/* This method is super hacky, and I could do better, but with limited time I resorted to this for simplicity */
+	/* I tried putting this in a method, but had a lot of trouble geting it to work like it does here */
 	if (!fd_found)
+<<<<<<< HEAD
 		buf = file_to_buffer(&fd_head, &fd_list, fd);
 	/* free fd list entry if we're done reading from the file */
+=======
+	{
+		if (!fd_head)
+		{
+			fd_head = malloc(sizeof(fd_list_t *));
+			fd_head->next = NULL;
+			fd_head->fd = fd;
+			fd_list = fd_head;
+		}
+		else
+		{
+			fd_list = prepend_fd(&fd_head, fd);
+			fd_head = fd_list;
+		}
+		buf = malloc(sizeof(char) * READ_SIZE);
+		while ((bytes_read = read(fd, buf + total_bytes_read, READ_SIZE)) != 0)
+		{
+			if (bytes_read == -1)
+				return (NULL);
+			total_bytes_read += bytes_read;
+			buf = _realloc(buf, total_bytes_read + READ_SIZE);
+		}
+		buf = _realloc(buf, total_bytes_read);
+		fd_list->bytes_left = total_bytes_read;
+	}
+
+	/* free variables and return NULL if no more bytes to read */
+>>>>>>> 8361edbf9fa6a9d83a88218ab182d18ecc7d0710
 	if (fd_list->bytes_left < 1)
 	{
 		fd_head = fd_list->next;
+		/* tried multiple ways of freeing @buf without success, I get a specific error everytime */
 		free(fd_list);
 		return (NULL);
 	}
+<<<<<<< HEAD
+=======
+	/* find length of next line */
+>>>>>>> 8361edbf9fa6a9d83a88218ab182d18ecc7d0710
 	n_ptr = _memchr(buf, '\n', fd_list->bytes_left);
 	if (n_ptr == NULL)
 		line_len = fd_list->bytes_left + 1;
 	else
 		line_len = (n_ptr - buf) + 1;
 	fd_list->bytes_left -= line_len;
+<<<<<<< HEAD
+=======
+	/* strip of null bytes */
+>>>>>>> 8361edbf9fa6a9d83a88218ab182d18ecc7d0710
 	line = remove_null_bytes(buf, line_len - 1);
 	buf = buf + line_len;
 	fd_list->buf = buf;
@@ -77,6 +118,7 @@ char *_memchr(char *buf, char c, int len)
 }
 
 
+<<<<<<< HEAD
 /**
  * file_to_buffer - put entire file inside of a buffer
  *
@@ -118,6 +160,8 @@ char *file_to_buffer(fd_list_t **fd_head, fd_list_t **fd_list, const int fd)
 }
 
 
+=======
+>>>>>>> 8361edbf9fa6a9d83a88218ab182d18ecc7d0710
 /**
  * _realloc - reallocate bytes to total_bytes_read length,
  * with extra bytes set to '\0'
@@ -169,7 +213,11 @@ fd_list_t *prepend_fd(fd_list_t **head, int fd)
  * remove_null_bytes - removes all null bytes except the for the last byte
  *
  * @line: string to strip
+<<<<<<< HEAD
  * @len: length of @line
+=======
+ * @len: length of line to strip
+>>>>>>> 8361edbf9fa6a9d83a88218ab182d18ecc7d0710
  *
  * Return: pointer to string, NULL, on error
  */
