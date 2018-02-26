@@ -44,15 +44,13 @@ def read_write_heap(pid, read_str, write_str):
 		print("Can't find {} in /proc/{}/mem".format(read_str, pid))
 		exit(1)
 	mem_file.seek(heap_start + str_offset)
-	mem_file.write(bytes(write_str, "ASCII"))
+	mem_file.write(bytes(write_str + '\0', "ASCII"))
 
 
-if __name__ == "__main__":
-	if (len(argv) == 4):
-		pid = argv[1]
-		search_str = argv[2]
-		replace_str = argv[3]
-		read_write_heap(pid, search_str, replace_str)
-	else:
-		print_usage()
-        asdf
+if (len(argv) == 4):
+	pid = argv[1]
+	search_str = argv[2]
+	replace_str = argv[3]
+	read_write_heap(pid, search_str, replace_str)
+else:
+	print_usage()
