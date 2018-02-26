@@ -44,7 +44,7 @@ def read_write_heap(pid, read_str, write_str):
 		print("Can't find {} in /proc/{}/mem".format(read_str, pid))
 		exit(1)
 	mem_file.seek(heap_start + str_offset)
-	mem_file.write(bytes(write_str + '\0', "ASCII"))
+	mem_file.write(bytes(write_str, "ASCII"))
 
 
 if __name__ == "__main__":
@@ -55,3 +55,4 @@ if __name__ == "__main__":
 		read_write_heap(pid, search_str, replace_str)
 	else:
 		print_usage()
+        asdf
