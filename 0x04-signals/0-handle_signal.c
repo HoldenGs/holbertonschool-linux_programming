@@ -3,7 +3,9 @@
 #include "signals.h"
 
 /**
+ * gotcha - handles the SIGINT signal
  *
+ * @signum: Signal number
  */
 void gotcha(int signum)
 {
@@ -12,6 +14,8 @@ void gotcha(int signum)
 
 /**
  * handle_signal - handle how a signal will be processed
+ *
+ * Return: 0 if success, -1 for failure to assign signal handler
  */
 int handle_signal(void)
 {
