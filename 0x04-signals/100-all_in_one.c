@@ -2,7 +2,7 @@
 #include <string.h>
 
 /**
- *
+ * all_in_one - add a signal handler for all known signals
  */
 void all_in_one(void)
 {
@@ -15,7 +15,7 @@ void all_in_one(void)
 }
 
 /**
- *
+ * handler - prints out "Caught" along with signal info when catching a signal
  */
 void handler(int signum, siginfo_t *info, void *context)
 {

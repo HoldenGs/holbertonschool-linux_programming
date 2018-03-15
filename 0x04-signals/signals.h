@@ -14,6 +14,9 @@ void (*current_handler_sigaction(void))(int);
 int trace_signal_sender(void);
 void trace_signal(int, siginfo_t *, void *);
 int pid_exist(pid_t);
+void all_in_one(void);
+void handler(int, siginfo_t *, void *);
+int sigset_init(sigset_t *, int *);
 
 
 #endif
