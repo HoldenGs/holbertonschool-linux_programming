@@ -15,9 +15,12 @@ int trace_signal_sender(void);
 void trace_signal(int, siginfo_t *, void *);
 int pid_exist(pid_t);
 void all_in_one(void);
-void handler(int, siginfo_t *, void *);
+void all_handler(int, siginfo_t *, void *);
 int sigset_init(sigset_t *, int *);
 int signals_block(int *);
+int signals_unblock(int *);
+int handle_pending(void (*)(int));
+void handler(int);
 
 
 #endif
