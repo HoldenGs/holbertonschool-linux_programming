@@ -3,7 +3,12 @@
 #include <stdlib.h>
 
 /**
+ * main - describe the signal number given as an argument
  *
+ * @ac: arg count
+ * @arg vector
+ *
+ * Return: 0 if success, EXIT_FAILURE on failure
  */
 int main(int ac, char **av)
 {
