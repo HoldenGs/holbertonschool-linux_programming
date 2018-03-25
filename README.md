@@ -17,6 +17,7 @@ These are signal functions with main functions you can use to test with.
 8. Terminate a process, but in bash instead of C
 9. Register a signal handler in bash
 10. Test is a PID given as a argument exists or not
+
 100. Handles all signals possible, and prints out information about the signal
 101. Initialize a signal set
 102. Block all signals given as an integer array by putting them in a signal set and setting the signal set
