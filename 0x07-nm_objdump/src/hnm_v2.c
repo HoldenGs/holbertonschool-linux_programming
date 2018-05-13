@@ -43,6 +43,8 @@ int nm(char *file)
 
 	free_elf(&elf);
 
+	free(symbols);
+
 	return (0);
 }
 
