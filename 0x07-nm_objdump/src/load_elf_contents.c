@@ -32,13 +32,7 @@ int load_elf_contents(Elf_t *elf, char *file)
 			file, strerror(errno));
 		exit(errno);
 	}
-	elf->data = malloc(elf->size);
-	if (elf->data == NULL)
-	{
-		fprintf(stderr, "malloc error allocating size of %lu: %s\n",
-			elf->size, strerror(errno));
-		exit(errno);
-	}
+	elf->data = safe_malloc(elf->size);
 	if (read(fd, elf->data, elf->size) == -1)
 	{
 		fprintf(stderr, "read error on file %s: %s\n",

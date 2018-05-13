@@ -14,6 +14,7 @@ void load_elf_header(Elf_t *elf)
 		fprintf(stderr, "%s is not an ELF file\n", elf->filename);
 		exit(-1);
 	}
+	elf->header = safe_malloc(sizeof(Elf_Big_Ehdr_t));
 	convert_elf_header_values(elf);
 }
 

@@ -12,7 +12,7 @@ int free_elf(Elf_t *elf)
 {
 	free(elf->data);
 	free(elf->sections);
-
+	free(elf->header);
 	return (0);
 }
 

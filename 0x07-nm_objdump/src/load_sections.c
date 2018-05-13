@@ -12,12 +12,7 @@ void load_sections(Elf_t *elf)
 	Elf_Shdr_t *header;
 	uint64_t (*convert_endian)(size_t, int);
 
-	elf->sections = malloc(elf->header->e_shnum * sizeof(Section_t));
-	if (elf->sections == NULL)
-	{
-		fprintf(stderr, "Failed to malloc space for sections\n");
-		exit(errno);
-	}
+	elf->sections = safe_malloc(elf->header->e_shnum * sizeof(Section_t));
 	for (i = 0; i < elf->header->e_shnum; i++)
 	{
 		elf->sections[i].header = convert_section_header_values(elf, i);
