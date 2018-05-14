@@ -207,7 +207,7 @@ typedef struct Elf_s
 } Elf_t;
 
 
-int nm(char *file);
+int nm(char *file, char *arg0);
 int hobjdump(char *file);
 int check_elf_file(unsigned char *mag);
 
@@ -229,7 +229,7 @@ void *safe_malloc(size_t size);
 Section_t *get_section_by_name(Elf_t *elf, char *name);
 Section_t *get_section_by_type(Elf_t *elf, int type);
 
-void print_symbols(Elf_t *elf, Sym_t *symbols);
+void print_symbols(Elf_t *elf, Sym_t *symbols, char *arg0);
 void print_sections(Elf_t *elf);
 void print_section(Elf_t *elf, int i);
 

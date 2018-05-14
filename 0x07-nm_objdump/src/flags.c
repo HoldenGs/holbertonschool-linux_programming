@@ -13,16 +13,16 @@ unsigned int get_flags(Elf_t *elf)
 	unsigned int flags;
 
 	flags = BFD_NO_FLAGS;
-	if (elf->header->e_type == ET_EXEC)
-		flags |= EXEC_P;
 	if (elf->header->e_type == ET_DYN ||
 		elf->header->e_type == ET_EXEC)
 		flags |= D_PAGED;
-	if (elf->header->e_type == ET_DYN)
+	if (elf->header->e_type == ET_EXEC)
+		flags |= EXEC_P;
+	else if (elf->header->e_type == ET_DYN)
 		flags |= DYNAMIC;
-	if (get_section_by_type(elf, SHT_REL))
+	else if (get_section_by_type(elf, SHT_REL))
 		flags |= HAS_RELOC;
-	if (!(flags & EXEC_P) && get_section_by_type(elf, SHT_RELA))
+	else if (!(flags & EXEC_P) && get_section_by_type(elf, SHT_RELA))
 		flags |= HAS_RELOC;
 	if (get_section_by_type(elf, SHT_SYMTAB) ||
 		get_section_by_type(elf, SHT_DYNSYM))

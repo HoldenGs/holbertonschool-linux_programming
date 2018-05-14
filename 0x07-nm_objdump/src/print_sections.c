@@ -142,5 +142,13 @@ void print_ascii(unsigned char *data, uint64_t size, int offset)
  */
 int hex_len(uint64_t n)
 {
-	return (floor(log(n) / LOG_BASE_16) + 1);
+	if (n <= 65535)
+		return (4);
+	if (n <= 1048575)
+		return (5);
+	if (n <= 16777215)
+		return (6);
+	if (n <= 268435455)
+		return (7);
+	return (8);
 }

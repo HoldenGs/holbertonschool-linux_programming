@@ -15,7 +15,7 @@ int main(int ac, char **av)
 		printf("Usage\n\t%s <binary_file>\n", av[0]);
 		return (1);
 	}
-	return (nm(av[1]));
+	return (nm(av[1], av[0]));
 }
 
 
@@ -23,10 +23,11 @@ int main(int ac, char **av)
  * nm - print out symbols for an ELF file
  *
  * @file: name of file
+ * @arg0 argument 0 of program
  *
  * Return: 0 for success, -1 for failure
  */
-int nm(char *file)
+int nm(char *file, char *arg0)
 {
 	Sym_t *symbols;
 	Elf_t elf;
@@ -39,7 +40,7 @@ int nm(char *file)
 
 	symbols = load_symbols(&elf);
 
-	print_symbols(&elf, symbols);
+	print_symbols(&elf, symbols, arg0);
 
 	free_elf(&elf);
 
