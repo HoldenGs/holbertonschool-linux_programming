@@ -1,6 +1,7 @@
 #ifndef HEADERS_H
 #define HEADERS_H
 
+#include <math.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -12,9 +13,14 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#define IS_CLASS_64(elf) (elf->ident[EI_CLASS] == ELFCLASS64)
 
-#define CONVERT_ENDIAN(field) convert_endian(field, sizeof(field))
+# define _S						", "
+# define _F(f, t, r)			printf("%s%s", r && (f & t) ? _S : "", f & t ? #t : "")
+
+#define LOG_BASE_16 			1 / log(16)
+#define IS_CLASS_64(elf) 		(elf->ident[EI_CLASS] == ELFCLASS64)
+
+#define CONVERT_ENDIAN(field) 	convert_endian(field, sizeof(field))
 
 /**
  * struct Elf_Big_Ehdr_s - universal elf header struct to hold both 32
@@ -189,15 +195,8 @@ typedef struct Elf_s
 } Elf_t;
 
 
-int print_elf_header(FILE *, Elf64_Ehdr *);
-int print_section_headers(FILE *, Elf64_Ehdr *);
-int print_program_headers(FILE *, Elf64_Ehdr *);
-char *itoa(int, char *, int);
-void reverse(char str[], int length);
-
-
-
 int nm(char *file);
+int hobjdump(char *file);
 int load_elf_contents(Elf_t *elf, char *file);
 void load_elf_header(Elf_t *elf);
 void load_sections(Elf_t *elf);
@@ -212,6 +211,12 @@ Sym_t *load_symbols(Elf_t *elf);
 Elf_Big_Sym_t convert_symbol_values(Elf_t *elf, Section_t *symtab, int i);
 Section_t *get_section_by_name(Elf_t *elf, char *name);
 void print_symbols(Elf_t *elf, Sym_t *symbols);
+void print_sections(Elf_t *elf);
+void print_section(Elf_t *elf, int i);
+
+int hex_len(uint64_t n);
+void print_hex(unsigned char *data, uint64_t size, int offset);
+void print_ascii(unsigned char *data, uint64_t size, int offset);
 
 char get_symbol_letter(Elf_t *elf, Elf_Big_Sym_t sym);
 char letter_by_section(Elf_t *elf, Elf_Big_Sym_t sym, unsigned char bind);
