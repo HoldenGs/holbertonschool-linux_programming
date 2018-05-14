@@ -25,6 +25,7 @@ void print_symbols(Elf_t *elf, Sym_t *symbols)
 		letter = get_symbol_letter(elf, symbols[i].sym);
 		if (IS_CLASS_64(elf) &&
 			ELF64_ST_TYPE(symbols[i].sym.st_info) != STT_FILE)
+		{
 			if (strcmp(symbols[i].name, ""))
 			{
 				if (!symbols[i].sym.st_value)
@@ -34,7 +35,9 @@ void print_symbols(Elf_t *elf, Sym_t *symbols)
 					printf("%016lx %c %s\n", symbols[i].sym.st_value,
 						letter, symbols[i].name);
 			}
+		}
 		else if (ELF32_ST_TYPE(symbols[i].sym.st_info) != STT_FILE)
+		{
 			if (strcmp(symbols[i].name, ""))
 			{
 				if (!symbols[i].sym.st_value)
@@ -43,5 +46,6 @@ void print_symbols(Elf_t *elf, Sym_t *symbols)
 					printf("%08lx %c %s\n", symbols[i].sym.st_value,
 						letter, symbols[i].name);
 			}
+		}
 	}
 }

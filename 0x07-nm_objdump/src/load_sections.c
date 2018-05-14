@@ -59,16 +59,16 @@ Elf_Big_Shdr_t convert_section_header_values(Elf_t *elf, int i)
 	}
 	else
 	{
-		section_header.sh_name = CONVERT_ENDIAN(header->Elf64.sh_name);
-		section_header.sh_type = CONVERT_ENDIAN(header->Elf64.sh_type);
-		section_header.sh_flags = CONVERT_ENDIAN(header->Elf64.sh_flags);
-		section_header.sh_addr = CONVERT_ENDIAN(header->Elf64.sh_addr);
-		section_header.sh_offset = CONVERT_ENDIAN(header->Elf64.sh_offset);
-		section_header.sh_size = CONVERT_ENDIAN(header->Elf64.sh_size);
-		section_header.sh_link = CONVERT_ENDIAN(header->Elf64.sh_link);
-		section_header.sh_info = CONVERT_ENDIAN(header->Elf64.sh_info);
-		section_header.sh_addralign = CONVERT_ENDIAN(header->Elf64.sh_addralign);
-		section_header.sh_entsize = CONVERT_ENDIAN(header->Elf64.sh_entsize);
+		section_header.sh_name = CONVERT_ENDIAN(header->Elf32.sh_name);
+		section_header.sh_type = CONVERT_ENDIAN(header->Elf32.sh_type);
+		section_header.sh_flags = CONVERT_ENDIAN(header->Elf32.sh_flags);
+		section_header.sh_addr = CONVERT_ENDIAN(header->Elf32.sh_addr);
+		section_header.sh_offset = CONVERT_ENDIAN(header->Elf32.sh_offset);
+		section_header.sh_size = CONVERT_ENDIAN(header->Elf32.sh_size);
+		section_header.sh_link = CONVERT_ENDIAN(header->Elf32.sh_link);
+		section_header.sh_info = CONVERT_ENDIAN(header->Elf32.sh_info);
+		section_header.sh_addralign = CONVERT_ENDIAN(header->Elf32.sh_addralign);
+		section_header.sh_entsize = CONVERT_ENDIAN(header->Elf32.sh_entsize);
 	}
 
 	return (section_header);
