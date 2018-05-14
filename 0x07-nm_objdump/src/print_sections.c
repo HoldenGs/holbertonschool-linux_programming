@@ -66,6 +66,8 @@ void print_section(Elf_t *elf, int i)
 			padding = hex_len(elf->sections[i].header.sh_addr + idx);
 			if (padding < 4)
 				padding = 4;
+			else if (padding > 8)
+				padding = 8;
 			printf(" %0*lx", padding, elf->sections[i].header.sh_addr + idx);
 			print_hex(
 				elf->sections[i].data,
