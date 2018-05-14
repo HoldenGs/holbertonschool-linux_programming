@@ -16,7 +16,7 @@ HNM_OBJECTS	=	src/hnm_v2.c \
 				inc/readelf.h
 # make hnm
 $(HNM_OUTPUT) : $(HNM_OBJECTS)
-	gcc -g -o $@ $^
+	gcc -o $@ $^
 
 
 # hobjdump program makefile
@@ -25,6 +25,15 @@ HOBJDUMP_OUTPUT		=	hobjdump
 
 HOBJDUMP_OBJECTS	=	src/hobjdump.c \
 						src/check_elf_file.c \
+						src/get_symbol_letter.c \
+						src/convert_endian.c \
+						src/load_elf_contents.c \
+						src/load_elf_header.c \
+						src/load_sections.c \
+						src/get_section_by_*.c \
+						src/print_sections.c -lm \
+						src/flags.c \
+						src/free.c \
 						inc/readelf.h
 # make hobjdump
 $(HOBJDUMP_OUTPUT) : $(HOBJDUMP_OBJECTS)

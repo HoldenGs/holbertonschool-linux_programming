@@ -14,13 +14,25 @@
 #include <errno.h>
 
 
+
+#define BFD_NO_FLAGS			0x00
+#define HAS_RELOC				0x01
+#define EXEC_P					0x02
+#define HAS_LINENO				0x04
+#define HAS_DEBUG				0x08
+#define HAS_SYMS				0x10
+#define HAS_LOCALS				0x20
+#define DYNAMIC					0x40
+#define WP_TEXT					0x80
+#define D_PAGED					0x100
+
 # define _S						", "
 # define _F(f, t, r)			printf("%s%s", r && (f & t) ? _S : "", f & t ? #t : "")
 
-#define LOG_BASE_16 			1 / log(16)
-#define IS_CLASS_64(elf) 		(elf->ident[EI_CLASS] == ELFCLASS64)
+#define LOG_BASE_16				(1 / log(16))
+#define IS_CLASS_64(elf)		(elf->ident[EI_CLASS] == ELFCLASS64)
 
-#define CONVERT_ENDIAN(field) 	convert_endian(field, sizeof(field))
+#define CONVERT_ENDIAN(data)	convert_endian(data, sizeof(data))
 
 /**
  * struct Elf_Big_Ehdr_s - universal elf header struct to hold both 32
@@ -197,22 +209,32 @@ typedef struct Elf_s
 
 int nm(char *file);
 int hobjdump(char *file);
+int check_elf_file(unsigned char *mag);
+
 int load_elf_contents(Elf_t *elf, char *file);
 void load_elf_header(Elf_t *elf);
 void load_sections(Elf_t *elf);
+Sym_t *load_symbols(Elf_t *elf);
+
+Elf_Big_Sym_t convert_symbol_values(Elf_t *elf, Section_t *symtab, int i);
 Elf_Big_Shdr_t convert_section_header_values(Elf_t *elf, int i);
 void convert_elf_header_values(Elf_t *elf);
-int check_elf_file(unsigned char *mag);
+
 uint64_t convert_big_endian(uint64_t data, int size);
 uint64_t convert_little_endian(uint64_t data, int size);
+
 int free_elf(Elf_t *elf);
 void *safe_malloc(size_t size);
-Sym_t *load_symbols(Elf_t *elf);
-Elf_Big_Sym_t convert_symbol_values(Elf_t *elf, Section_t *symtab, int i);
+
 Section_t *get_section_by_name(Elf_t *elf, char *name);
+Section_t *get_section_by_type(Elf_t *elf, int type);
+
 void print_symbols(Elf_t *elf, Sym_t *symbols);
 void print_sections(Elf_t *elf);
 void print_section(Elf_t *elf, int i);
+
+unsigned int get_flags(Elf_t *elf);
+void print_flags(unsigned int flags);
 
 int hex_len(uint64_t n);
 void print_hex(unsigned char *data, uint64_t size, int offset);
