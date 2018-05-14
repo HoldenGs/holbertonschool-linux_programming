@@ -4,11 +4,12 @@
  * load_elf_contents - load elf file contents and size into a data structure
  *
  * @elf: elf file data structure
- * @file: file to load from
+ * @file: file to load
+ * @progname: name of program
  *
  * Return: 0 if success, -1 for failure
  */
-int load_elf_contents(Elf_t *elf, char *file)
+int load_elf_contents(Elf_t *elf, char *file, char *progname)
 {
 	int fd;
 
@@ -41,5 +42,6 @@ int load_elf_contents(Elf_t *elf, char *file)
 	}
 	close(fd);
 	elf->filename = file;
+	elf->progname = progname;
 	return (0);
 }

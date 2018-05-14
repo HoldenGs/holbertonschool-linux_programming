@@ -23,7 +23,7 @@ int main(int ac, char **av)
  * nm - print out symbols for an ELF file
  *
  * @file: name of file
- * @arg0 argument 0 of program
+ * @arg0: argument 0 of program
  *
  * Return: 0 for success, -1 for failure
  */
@@ -32,7 +32,7 @@ int nm(char *file, char *arg0)
 	Sym_t *symbols;
 	Elf_t elf;
 
-	load_elf_contents(&elf, file);
+	load_elf_contents(&elf, file, arg0);
 
 	load_elf_header(&elf);
 
@@ -40,7 +40,7 @@ int nm(char *file, char *arg0)
 
 	symbols = load_symbols(&elf);
 
-	print_symbols(&elf, symbols, arg0);
+	print_symbols(&elf, symbols);
 
 	free_elf(&elf);
 

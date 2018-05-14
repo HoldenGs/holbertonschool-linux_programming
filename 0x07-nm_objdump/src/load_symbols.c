@@ -16,13 +16,13 @@ Sym_t *load_symbols(Elf_t *elf)
 	symtab = get_section_by_name(elf, ".symtab");
 	if (symtab == NULL)
 	{
-		fprintf(stderr, "symtab not found in %s\n", elf->filename);
+		fprintf(stderr, "%s: %s: no symbols\n", elf->progname, elf->filename);
 		exit(-1);
 	}
 	strtab = get_section_by_name(elf, ".strtab");
 	if (strtab == NULL)
 	{
-		fprintf(stderr, "strtab not found in %s\n", elf->filename);
+		fprintf(stderr, "%s: %s: no strtab\n", elf->progname, elf->filename);
 		exit(-1);
 	}
 	symtab_entries = symtab->header.sh_size / symtab->header.sh_entsize;

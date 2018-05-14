@@ -20,9 +20,9 @@ char get_symbol_letter(Elf_t *elf, Elf_Big_Sym_t sym)
 		letter = 'v';
 	else if (bind == STB_WEAK && type == STT_OBJECT && sym.st_value)
 		letter = 'V';
-	else if (bind == STB_WEAK && !sym.st_value)
+	else if (bind == STB_WEAK && sym.st_shndx == SHN_UNDEF)
 		letter = 'w';
-	else if (bind == STB_WEAK && sym.st_value)
+	else if (bind == STB_WEAK && sym.st_shndx != SHN_UNDEF)
 		letter = 'W';
 	else if (sym.st_shndx == SHN_UNDEF)
 		letter = 'U';
@@ -63,8 +63,10 @@ int safe_cmp(const char *s1, const char *s2)
 char letter_by_section(Elf_t *elf, Elf_Big_Sym_t sym, unsigned char bind)
 {
 	char *name, letter;
+	Section_t section;
 
-	name = elf->sections[sym.st_shndx].name;
+	section = elf->sections[sym.st_shndx];
+	name = section.name;
 	if (!safe_cmp(name, ".init") || !safe_cmp(name, ".text") ||
 		!safe_cmp(name, ".init_array") || !safe_cmp(name, ".init") ||
 		!safe_cmp(name, ".fini") || !safe_cmp(name, ".fini_array") ||
@@ -73,17 +75,20 @@ char letter_by_section(Elf_t *elf, Elf_Big_Sym_t sym, unsigned char bind)
 			letter = 't';
 		else
 			letter = 'T';
-	else if (!safe_cmp(name, ".dynamic") || !safe_cmp(name, ".data") ||
-		!safe_cmp(name, ".jcr") || !safe_cmp(name, ".got.plt"))
-		if (bind == STB_LOCAL)
-			letter = 'd';
-		else
-			letter = 'D';
-	else if (!safe_cmp(name, ".eh_frame") || !safe_cmp(name, ".rodata"))
+	else if (!(section.header.sh_flags & SHF_WRITE))
 		if (bind == STB_LOCAL)
 			letter = 'r';
 		else
 			letter = 'R';
+	else if (!safe_cmp(name, ".dynamic") || !safe_cmp(name, ".data") ||
+			!safe_cmp(name, ".jcr") || !safe_cmp(name, ".got.plt") ||
+			!safe_cmp(name, ".got") || !safe_cmp(name, ".tm_clone_table") ||
+			!safe_cmp(name, ".got") || !safe_cmp(name, ".ctors") ||
+			!safe_cmp(name, ".dtors") || !safe_cmp(name, ".eh_frame"))
+		if (bind == STB_LOCAL)
+			letter = 'd';
+		else
+			letter = 'D';
 	else if (!safe_cmp(name, ".bss"))
 		if (bind == STB_LOCAL)
 			letter = 'b';

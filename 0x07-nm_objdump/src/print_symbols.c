@@ -6,9 +6,8 @@
  *
  * @elf: elf data structure
  * @symbols: list of symbols
- * @arg0: argument 0 of program
  */
-void print_symbols(Elf_t *elf, Sym_t *symbols, char *arg0)
+void print_symbols(Elf_t *elf, Sym_t *symbols)
 {
 	Section_t *symtab;
 	int symtab_entries, i;
@@ -17,7 +16,7 @@ void print_symbols(Elf_t *elf, Sym_t *symbols, char *arg0)
 	symtab = get_section_by_name(elf, ".symtab");
 	if (symtab == NULL)
 	{
-		fprintf(stderr, "%s: %s: no symbols\n", arg0, elf->filename);
+		fprintf(stderr, "%s: %s: no symbols\n", elf->progname, elf->filename);
 		exit(-1);
 	}
 	symtab_entries = symtab->header.sh_size / symtab->header.sh_entsize;
@@ -29,8 +28,8 @@ void print_symbols(Elf_t *elf, Sym_t *symbols, char *arg0)
 		{
 			if (strcmp(symbols[i].name, ""))
 			{
-				if ((!symbols[i].sym.st_value || letter == 'U') &&
-					safe_cmp(symbols[i].name, "main"))
+				if ((!symbols[i].sym.st_value || letter == 'U' ||
+					letter == 'w') && safe_cmp(symbols[i].name, "main"))
 					printf("                 %c %s\n", letter,
 						symbols[i].name);
 				else
@@ -42,8 +41,8 @@ void print_symbols(Elf_t *elf, Sym_t *symbols, char *arg0)
 		{
 			if (strcmp(symbols[i].name, ""))
 			{
-				if ((!symbols[i].sym.st_value || letter == 'U') &&
-					safe_cmp(symbols[i].name, "main"))
+				if ((!symbols[i].sym.st_value || letter == 'U' ||
+					letter == 'w') && safe_cmp(symbols[i].name, "main"))
 					printf("         %c %s\n", letter, symbols[i].name);
 				else
 					printf("%08lx %c %s\n", symbols[i].sym.st_value,
