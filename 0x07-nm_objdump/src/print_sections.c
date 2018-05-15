@@ -10,19 +10,22 @@ void print_sections(Elf_t *elf)
 {
 	unsigned int flags;
 	int i, class;
-	char *machine, *machine_prepend;
+	char *machine, *arch;
 
-	machine_prepend = "";
+	arch = "";
 	if (elf->ident[EI_CLASS] == ELFCLASS64)
 		class = 64;
 	else
 		class = 32;
 	if (elf->header->e_machine == EM_386)
+	{
 		machine = "i386";
+		arch = "i386";
+	}
 	else if (elf->header->e_machine == EM_X86_64)
 	{
 		machine = "x86-64";
-		machine_prepend = "i386";
+		arch = "i386:x86-64";
 	}
 	else
 	{
@@ -30,12 +33,13 @@ void print_sections(Elf_t *elf)
 			machine = "big";
 		else
 			machine = "little";
+		arch = "UNKNOWN!";
 	}
 	flags = get_flags(elf);
 	printf("\n%s:     file format elf%d-%s\n",
 		elf->filename, class, machine);
-	printf("architecture: %s:%s, flags 0x%08x:\n",
-		machine_prepend, machine, flags);
+	printf("architecture: %s, flags 0x%08x:\n",
+		arch, flags);
 	print_flags(flags);
 	if (IS_CLASS_64(elf))
 		printf("start address 0x%016lx\n\n", elf->header->e_entry);
@@ -56,14 +60,21 @@ void print_section(Elf_t *elf, int i)
 {
 	int padding, idx;
 
-	if (strcmp(elf->sections[i].name, "") &&
+	if (elf->sections[i].header.sh_size > 0 &&
+		strcmp(elf->sections[i].name, "") &&
 		strcmp(elf->sections[i].name, ".bss") &&
-		strstr(elf->sections[i].name, "tab") == NULL)
+		strcmp(elf->sections[i].name, ".symtab") &&
+		strcmp(elf->sections[i].name, ".strtab") &&
+		strcmp(elf->sections[i].name, ".shstrtab") &&
+		(strstr(elf->sections[i].name, ".rela") == NULL ||
+			!safe_cmp(elf->sections[i].name, ".rela.dyn") ||
+			!safe_cmp(elf->sections[i].name, ".rela.plt")))
 	{
 		printf("Contents of section %s:\n", elf->sections[i].name);
 		for (idx = 0; idx < elf->sections[i].header.sh_size; idx += 16)
 		{
-			padding = hex_len(elf->sections[i].header.sh_addr + idx);
+			padding = hex_len(elf->sections[i].header.sh_addr +
+				elf->sections[i].header.sh_size);
 			if (padding < 4)
 				padding = 4;
 			else if (padding > 8)
@@ -142,6 +153,7 @@ void print_ascii(unsigned char *data, uint64_t size, int offset)
  */
 int hex_len(uint64_t n)
 {
+
 	if (n <= 65535)
 		return (4);
 	if (n <= 1048575)

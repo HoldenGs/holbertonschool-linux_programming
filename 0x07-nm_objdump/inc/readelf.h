@@ -189,6 +189,7 @@ typedef struct Section_s
  * struct Elf_s - Elf header struct abstraction,
  * holds file name, size of file, and all of the file information
  *
+ * @progname: name of our program
  * @filename: name of file
  * @size: size of file
  * @data: raw bytes of file
@@ -198,6 +199,7 @@ typedef struct Section_s
  */
 typedef struct Elf_s
 {
+	char *progname;
 	char *filename;
 	ssize_t size;
 	unsigned char *data;
@@ -208,10 +210,10 @@ typedef struct Elf_s
 
 
 int nm(char *file, char *arg0);
-int hobjdump(char *file);
+int hobjdump(char *file, char *progname);
 int check_elf_file(unsigned char *mag);
 
-int load_elf_contents(Elf_t *elf, char *file);
+int load_elf_contents(Elf_t *elf, char *file, char *progname);
 void load_elf_header(Elf_t *elf);
 void load_sections(Elf_t *elf);
 Sym_t *load_symbols(Elf_t *elf);
@@ -225,11 +227,12 @@ uint64_t convert_little_endian(uint64_t data, int size);
 
 int free_elf(Elf_t *elf);
 void *safe_malloc(size_t size);
+int safe_cmp(const char *s1, const char *s2);
 
 Section_t *get_section_by_name(Elf_t *elf, char *name);
 Section_t *get_section_by_type(Elf_t *elf, int type);
 
-void print_symbols(Elf_t *elf, Sym_t *symbols, char *arg0);
+void print_symbols(Elf_t *elf, Sym_t *symbols);
 void print_sections(Elf_t *elf);
 void print_section(Elf_t *elf, int i);
 
