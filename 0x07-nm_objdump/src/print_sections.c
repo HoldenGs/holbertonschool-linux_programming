@@ -67,8 +67,12 @@ void print_section(Elf_t *elf, int i)
 		strcmp(elf->sections[i].name, ".strtab") &&
 		strcmp(elf->sections[i].name, ".shstrtab") &&
 		(strstr(elf->sections[i].name, ".rel") == NULL ||
+			!strcmp(elf->sections[i].name, ".rel.dyn") ||
 			!strcmp(elf->sections[i].name, ".rela.dyn") ||
-			!strcmp(elf->sections[i].name, ".rela.plt")))
+			!strcmp(elf->sections[i].name, ".rela.plt") ||
+			!strcmp(elf->sections[i].name, ".rel.plt") ||
+			!strcmp(elf->sections[i].name, ".rel.got") ||
+			!strcmp(elf->sections[i].name, ".data.rel.ro")))
 	{
 		printf("Contents of section %s:\n", elf->sections[i].name);
 		for (idx = 0; idx < elf->sections[i].header.sh_size; idx += 16)
