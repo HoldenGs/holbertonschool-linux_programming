@@ -1,5 +1,5 @@
 #ifndef _SYSCALLS_H_
-# define _SYSCALLS_H_
+#define _SYSCALLS_H_
 
 # include <stddef.h>
 

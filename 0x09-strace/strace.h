@@ -1,6 +1,6 @@
 
-#ifndef _SYSCALLS_H_
-#define _SYSCALLS_H_
+#ifndef _STRACE_H_
+#define _STRACE_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,4 +16,4 @@ int parent_trace(pid_t pid);
 int wait_for_syscall(pid_t pid);
 int child_trace(int ac, char **av);
 
-#endif /* _SYSCALLS_H_ */
+#endif /* _STRACE_H_ */
