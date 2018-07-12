@@ -51,11 +51,14 @@ int parent_trace(pid_t pid)
 			break;
 
 		ptrace(PTRACE_GETREGS, pid, 0, &regs);
-		syscall_name = NULL;
-		for (i = 0; i < 318 && syscall_name == NULL; i++)
+		
+		for (i = 0; i < 318; i++)
 		{
 			if (regs.orig_rax == syscalls_64_g[i].nr)
+			{
 				syscall_name = strdup(syscalls_64_g[i].name);
+				break;
+			}
 		}
 		printf("%s", syscall_name);
 		free(syscall_name);

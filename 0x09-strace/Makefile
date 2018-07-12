@@ -28,6 +28,16 @@ $(2_OUTPUT) : $(2_OBJECTS)
 	gcc -o $@ $^
 
 
+3_OBJECTS	=	strace_3.c \
+				strace.h \
+				syscalls.h
+
+3_OUTPUT	=	strace_3
+
+$(3_OUTPUT) : $(3_OBJECTS)
+	gcc -o $@ $^
+
+
 PHONEY: clean
 
 clean: rm 0_OUTPUT
