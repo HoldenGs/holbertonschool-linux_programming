@@ -64,6 +64,7 @@ int parent_trace(pid_t pid)
 		free(syscall_name);
 		if (regs.orig_rax == 231)
 			printf(" = ?\n");
+		fflush(stdout);
 
 		if (wait_for_syscall(pid) == 1)
 			break;
