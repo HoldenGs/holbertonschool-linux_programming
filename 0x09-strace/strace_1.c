@@ -59,6 +59,7 @@ int parent_trace(pid_t pid)
 		}
 		printf("%s\n", syscall_name);
 		free(syscall_name);
+		fflush(stdout);
 
 		if (wait_for_syscall(pid) == 1)
 			break;
