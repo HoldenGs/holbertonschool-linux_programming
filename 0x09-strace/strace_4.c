@@ -6,6 +6,7 @@
  *
  * @ac: argument count
  * @av: argument vector
+ * @environ: environment variables
  *
  * Return: 0
  */
