@@ -39,6 +39,7 @@ $(3_OUTPUT) : $(3_OBJECTS)
 
 
 4_OBJECTS	=	strace_4.c \
+				print_helpers.c \
 				strace.h \
 				syscalls.h
 

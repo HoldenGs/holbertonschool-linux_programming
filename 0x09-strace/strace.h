@@ -15,7 +15,7 @@
 /* Prototypes */
 int parent_trace(pid_t pid);
 int wait_for_syscall(pid_t pid);
-int child_trace(int ac, char **av);
+int child_trace(int ac, char **av, char **environ);
 void print_syscall_with_params(struct user_regs_struct regs, pid_t pid);
 char *read_string(int child, unsigned long addr);
 

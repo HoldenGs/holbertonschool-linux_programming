@@ -1,17 +1,15 @@
 #include "strace.h"
 #include "syscalls.h"
 
-extern char **environ;
-
 /**
- * main - sort of working system call number printer. Prints out system calls twice
+ * main - Prints out system calls along with argument information
  *
  * @ac: argument count
  * @av: argument vector
  *
  * Return: 0
  */
-int main(int ac, char **av)
+int main(int ac, char **av, char **environ)
 {
 	int i;
 	pid_t pid;
@@ -20,7 +18,7 @@ int main(int ac, char **av)
 	pid = fork();
 	if (pid == 0)
 	{
-		if (child_trace(ac - 1, av + 1) == -1)
+		if (child_trace(ac - 1, av + 1, environ) == -1)
 			return (-1);
 	}
 	else
@@ -36,7 +34,8 @@ int main(int ac, char **av)
 			else
 				printf("], ");
 		}
-		for (i = 0; environ[i]; i++);
+		for (i = 0; environ[i]; i++)
+			;
 		printf("[/* %d vars */]", i);
 		if (parent_trace(pid) == -1)
 			return (-1);
@@ -61,6 +60,7 @@ int parent_trace(pid_t pid)
 	while (1)
 	{
 		struct user_regs_struct regs;
+
 		if (wait_for_syscall(pid) == 1)
 			break;
 
@@ -83,99 +83,6 @@ int parent_trace(pid_t pid)
 	}
 
 	return (0);
-}
-
-/**
- * print_syscall_with_params - print out the system call and it's parameters
- *
- * regs: Registers of the tracee
- */
-void print_syscall_with_params(struct user_regs_struct regs, pid_t pid)
-{
-	long long unsigned int param;
-	char *syscall_name, *string;
-	int i, j;
-
-	for (i = 0; i < 318; i++)
-	{
-		if (regs.orig_rax == syscalls_64_g[i].nr)
-		{
-			syscall_name = strdup(syscalls_64_g[i].name);
-			break;
-		}
-	}
-	printf("%s(", syscall_name);
-	free(syscall_name);
-	for (j = 0; j < syscalls_64_g[i].nb_params; j++)
-	{
-		if (j == 0)
-			param = regs.rdi;
-		if (j == 1)
-			param = regs.rsi;
-		if (j == 2)
-			param = regs.rdx;
-		if (j == 3)
-			param = regs.r10;
-		if (j == 4)
-			param = regs.r8;
-		if (j == 5)
-			param = regs.r9;
-		if (syscalls_64_g[i].params[j] == CHAR_P)
-		{
-			string = read_string(pid, param);
-			if (string == NULL)
-				return;
-			printf("\"%s\"", string);
-			free(string);
-		}
-		else if (syscalls_64_g[i].params[j] == VARARGS)
-			printf("...");
-		else if (param != 0 && regs.orig_rax != 59)
-			printf("0x%llx", param);
-		else
-			printf("0");
-		if (j < syscalls_64_g[i].nb_params - 1)
-			printf(", ");
-	}
-}
-
-/**
- * read_string - read a string from an address until the end. Found on
- * StackOverflow:
- * https://stackoverflow.com/questions/10385784/how-to-get-a-char-with-ptrace
- *
- * @child: child pid to trace
- * @addr: address in child userspace to peek at
- *
- * Return: address of allocated string, or NULL on failure
- */
-char *read_string(int child, unsigned long addr)
-{
-    char *val = malloc(4096);
-    int allocated = 4096, read = 0;
-    unsigned long tmp = 0;
-
-	if (val == NULL)
-		return (NULL);
-    while (1) {
-        if (read + sizeof(tmp) > allocated)
-		{
-            allocated *= 2;
-            val = realloc(val, allocated);
-			if (val == NULL)
-				return (NULL);
-        }
-        tmp = ptrace(PTRACE_PEEKDATA, child, addr + read);
-        if(errno != 0)
-		{
-            val[read] = 0;
-            break;
-        }
-        memcpy(val + read, &tmp, sizeof(tmp));
-        if (memchr(&tmp, 0, sizeof(tmp)) != NULL) break;
-        read += sizeof(tmp);
-    }
-    return (val);
 }
 
 /**
@@ -205,10 +112,11 @@ int wait_for_syscall(pid_t pid)
  *
  * @ac: argument count
  * @av: argument vector
- * 
+ * @environ: environment variables
+ *
  * Return: nothing on success, -1 on failure
  */
-int child_trace(int ac, char **av)
+int child_trace(int ac, char **av, char **environ)
 {
 	int p_ret, e_ret, i;
 	char *args[ac + 1];
