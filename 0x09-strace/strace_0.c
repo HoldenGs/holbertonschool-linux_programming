@@ -50,6 +50,7 @@ int parent_trace(pid_t pid)
 
 		ptrace(PTRACE_GETREGS, pid, 0, &regs);
 		printf("%llu\n", regs.orig_rax);
+		fflush(NULL);
 
 		if (wait_for_syscall(pid) == 1)
 			break;
