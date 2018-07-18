@@ -52,8 +52,7 @@ int parent_trace(pid_t pid)
 		print_syscall_with_params(regs, pid);
 		if (regs.orig_rax == 231)
 			printf(") = ?\n");
-
-		fflush(stdout);
+		fflush(NULL);
 
 		if (wait_for_syscall(pid) == 1)
 			break;

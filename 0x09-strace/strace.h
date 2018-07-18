@@ -16,7 +16,7 @@
 #include <sys/wait.h>
 #include <sys/user.h>
 
-#define IS_BIT_SET(field, bit)	((field & bit) == bit)
+#define IS_BIT_SET(field, bit)	(((field) & (bit)) == (bit))
 
 /* Prototypes */
 int parent_trace(pid_t pid);
