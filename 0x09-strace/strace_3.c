@@ -50,6 +50,7 @@ int parent_trace(pid_t pid)
 
 		ptrace(PTRACE_GETREGS, pid, 0, &regs);
 		print_syscall_with_params(regs, pid);
+		fflush(NULL);
 		if (regs.orig_rax == 231)
 			printf(") = ?\n");
 		fflush(NULL);
