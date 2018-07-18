@@ -46,6 +46,29 @@ $(3_OUTPUT) : $(3_OBJECTS)
 4_OUTPUT	=	strace_4
 
 $(4_OUTPUT) : $(4_OBJECTS)
+	gcc -o $@ $^
+
+
+5_OBJECTS	=	strace_5.c \
+				print_helpers_5.c \
+				strace.h \
+				syscalls.h
+
+5_OUTPUT	=	strace_5
+
+$(5_OUTPUT) : $(5_OBJECTS)
+	gcc -o $@ $^
+
+
+6_OBJECTS	=	strace_6.c \
+				print_helpers_6.c \
+				print_flags_6.c \
+				strace.h \
+				syscalls.h
+
+6_OUTPUT	=	strace_6
+
+$(6_OUTPUT) : $(6_OBJECTS)
 	gcc -g3 -o $@ $^
 
 

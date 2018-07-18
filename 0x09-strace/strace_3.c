@@ -1,8 +1,6 @@
 #include "strace.h"
 #include "syscalls.h"
 
-extern char **environ;
-
 /**
  * main - sort of working system call number printer. Prints out system calls twice
  *
@@ -11,14 +9,14 @@ extern char **environ;
  *
  * Return: 0
  */
-int main(int ac, char **av)
+int main(int ac, char **av, char **environ)
 {
 	pid_t pid;
 
 	pid = fork();
 	if (pid == 0)
 	{
-		if (child_trace(ac - 1, av + 1) == -1)
+		if (child_trace(ac - 1, av + 1, environ) == -1)
 			return (-1);
 	}
 	else
@@ -51,7 +49,7 @@ int parent_trace(pid_t pid)
 			break;
 
 		ptrace(PTRACE_GETREGS, pid, 0, &regs);
-		print_syscall_with_params(regs);
+		print_syscall_with_params(regs, pid);
 		if (regs.orig_rax == 231)
 			printf(") = ?\n");
 
@@ -73,9 +71,10 @@ int parent_trace(pid_t pid)
 /**
  * print_syscall_with_params - print out the system call and it's parameters
  *
- * regs: Registers of the tracee
+ * @regs: Registers of the tracee
+ * @pid: child pid
  */
-void print_syscall_with_params(struct user_regs_struct regs)
+int print_syscall_with_params(struct user_regs_struct regs, pid_t pid)
 {
 	long long unsigned int param;
 	char *syscall_name;
@@ -114,6 +113,7 @@ void print_syscall_with_params(struct user_regs_struct regs)
 		if (j < syscalls_64_g[i].nb_params - 1)
 			printf(", ");
 	}
+	return (i);
 }
 
 /**
@@ -146,7 +146,7 @@ int wait_for_syscall(pid_t pid)
  * 
  * Return: nothing on success, -1 on failure
  */
-int child_trace(int ac, char **av)
+int child_trace(int ac, char **av, char **environ)
 {
 	int p_ret, e_ret;
 	char *args[ac + 1];

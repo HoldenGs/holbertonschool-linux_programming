@@ -11,14 +11,14 @@ extern char **environ;
  *
  * Return: 0
  */
-int main(int ac, char **av)
+int main(int ac, char **av, char **environ)
 {
 	pid_t pid;
 
 	pid = fork();
 	if (pid == 0)
 	{
-		if (child_trace(ac - 1, av + 1) == -1)
+		if (child_trace(ac - 1, av + 1, environ) == -1)
 			return (-1);
 	}
 	else
@@ -109,7 +109,7 @@ int wait_for_syscall(pid_t pid)
  * 
  * Return: nothing on success, -1 on failure
  */
-int child_trace(int ac, char **av)
+int child_trace(int ac, char **av, char **environ)
 {
 	int p_ret, e_ret;
 	char *args[ac + 1];
