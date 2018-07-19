@@ -34,7 +34,7 @@ int print_syscall_with_params(struct user_regs_struct regs, pid_t pid)
 		if (j == 2)
 			param = regs.rdx;
 		if (j == 3)
-			param = regs.r10;
+			param = regs.rcx;
 		if (j == 4)
 			param = regs.r8;
 		if (j == 5)
