@@ -50,10 +50,10 @@ int parent_trace(pid_t pid)
 
 		ptrace(PTRACE_GETREGS, pid, 0, &regs);
 		print_syscall_with_params(regs, pid);
-		fflush(NULL);
 		if (regs.orig_rax == 231)
 			printf(") = ?\n");
-		fflush(NULL);
+
+		fflush(stdout);
 
 		if (wait_for_syscall(pid) == 1)
 			break;
@@ -76,7 +76,7 @@ int parent_trace(pid_t pid)
  */
 int print_syscall_with_params(struct user_regs_struct regs, pid_t pid)
 {
-	long long unsigned int param;
+	unsigned long int param;
 	char *syscall_name;
 	int i, j;
 
@@ -107,7 +107,7 @@ int print_syscall_with_params(struct user_regs_struct regs, pid_t pid)
 		if (syscalls_64_g[i].params[j] == VARARGS)
 			printf("...");
 		else if (param != 0 && regs.orig_rax != 59)
-			printf("0x%llx", param);
+			printf("0x%lx", param);
 		else
 			printf("0");
 		if (j < syscalls_64_g[i].nb_params - 1)
