@@ -37,6 +37,11 @@ void print_open_flags(pid_t pid, unsigned long long int param, int i, int j)
 		(count) ? printf("|") : 0 ;
 		printf("O_WRONLY");
 	}
+	if (IS_BIT_SET(param, O_RDWR))
+	{
+		(count) ? printf("|") : 0 ;
+		printf("O_RDWR"), count++;
+	}
 	if (IS_BIT_SET(param, O_CLOEXEC))
 	{
 		(count) ? printf("|") : 0 ;

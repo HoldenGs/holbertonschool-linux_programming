@@ -113,7 +113,7 @@ void print_ret(pid_t pid, unsigned long long int param, int i)
 		string = read_string(pid, param);
 		if (string == NULL)
 			return;
-		printf("\"%s\"", string);
+		printf("\"%s\"\n", string);
 		free(string);
 	}
 	else if (syscalls_64_g[i].ret == VARARGS)
