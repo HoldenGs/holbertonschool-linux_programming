@@ -27,12 +27,11 @@ int main(void)
 	if (bind(sock, (struct sockaddr *)&addr_port, sizeof(addr_port)) < 0)
 		exit_with_error("bind() failed");
 
+	if (listen(sock, 64) < 0)
+		exit_with_error("listen() failed");
 	printf("Server listening on port %d\n", port);
 	while (1)
-	{
-		if (listen(sock, 64) < 0)
-			exit_with_error("listen() failed");
-	}
+	{}
 
 	return (0);
 }
