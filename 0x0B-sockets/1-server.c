@@ -48,8 +48,9 @@ int main(void)
 		exit_with_error("accept() failed");
 	client_name = inet_ntoa(client_addr.sin_addr);
 	printf("Client connected: %s\n", client_name);
-	close(client_socket);
 
+	close(server_socket);
+	close(client_socket);
 	return (0);
 }
 
