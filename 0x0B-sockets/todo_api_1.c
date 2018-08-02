@@ -89,7 +89,6 @@ void handle_client(int client_socket)
 		i++;
 	}
 	printf("-> \"%.*s\"\n", i - print_start, msg + print_start);
-	printf("%s\n", ok_msg);
 	if (send(client_socket, ok_msg, strlen(ok_msg), 0) < 0)
 		exit_with_error("send() failed");
 	fflush(NULL);
