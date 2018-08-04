@@ -18,3 +18,26 @@ $(0_OUTPUT) : $(0_OBJECTS)
 
 $(1_OUTPUT) : $(1_OBJECTS)
 	gcc -o $@ $^
+
+
+
+
+2_OBJECTS	=	todo_api_2.c \
+				todo_api_2.h
+
+2_OUTPUT	=	todo_api_2
+
+$(2_OUTPUT) : $(2_OBJECTS)
+	gcc -o $@ $^
+
+
+
+
+3_OBJECTS	=	todo_api_3.c \
+				todo_api_3.h
+
+3_OUTPUT	=	todo_api_3
+
+$(3_OUTPUT) : $(3_OBJECTS)
+	gcc -o $@ $^
+
