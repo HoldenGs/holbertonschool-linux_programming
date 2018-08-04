@@ -56,7 +56,7 @@ int main(void)
  */
 void handle_client(int client_socket)
 {
-	char msg[MSG_SIZE];
+	char msg[MSG_SIZE], ok_msg[] = "HTTP/1.1 200 OK\r\n\r\n";
 	ssize_t message_size = 0;
 
 	memset(msg, '\0', MSG_SIZE);
@@ -64,6 +64,9 @@ void handle_client(int client_socket)
 	if (message_size < 0)
 		exit_with_error("recv() failed");
 	printf("Raw request: \"%s\"\n", msg);
+
+	if (send(client_socket, ok_msg, strlen(ok_msg), 0) < 0)
+		exit_with_error("send() failed");
 }
 
 /**
