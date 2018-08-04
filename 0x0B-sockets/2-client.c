@@ -40,7 +40,6 @@ int main(int ac, char **av)
 	server_addr.sin_port = htons(port);
 	if (inet_aton(host, &server_addr.sin_addr) == 0)
 		exit_with_error("inet_aton() failed");
-	printf("host: %d\n", server_addr.sin_addr.s_addr);
 	if (connect(
 		client_socket,
 		(struct sockaddr *)&server_addr,
