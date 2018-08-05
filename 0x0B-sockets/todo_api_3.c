@@ -108,7 +108,7 @@ void print_body_params(char *msg, ssize_t msg_len)
 	{
 		if (msg[i] == '=')
 		{
-			printf("Query: \"%.*s\" ", i - print_start, msg + print_start);
+			printf("Body param: \"%.*s\" ", i - print_start, msg + print_start);
 			print_start = i + 1;
 		}
 		if (msg[i] == '&')
