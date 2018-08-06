@@ -58,12 +58,22 @@ void handle_client(int client_socket)
 {
 	char msg[MSG_SIZE], ok_msg[] = "HTTP/1.1 200 OK\r\n\r\n";
 	ssize_t message_size = 0;
+	int i, print_start = 0;
 
 	memset(msg, '\0', MSG_SIZE);
 	message_size = recv(client_socket, msg, MSG_SIZE, 0);
 	if (message_size < 0)
 		exit_with_error("recv() failed");
 	printf("Raw request: \"%s\"\n", msg);
+
+	for (i = 0; msg[i] != ' '; i++);
+	printf("Method: %.*s\n", i - print_start, msg + print_start);
+	print_start = i + 1;
+	for (i = i + 1; msg[i] != ' '; i++);
+	printf("Path: %.*s\n", i - print_start, msg + print_start);
+	print_start = i + 1;
+	for (i = i + 1; msg[i] != '\n'; i++);
+	printf("Version: %.*s\n", i - print_start, msg + print_start);
 
 	if (send(client_socket, ok_msg, strlen(ok_msg), 0) < 0)
 		exit_with_error("send() failed");
