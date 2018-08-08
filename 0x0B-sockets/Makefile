@@ -44,11 +44,13 @@ $(3_OUTPUT) : $(3_OBJECTS)
 
 
 
-4_OBJECTS	=	todo_api_4.c \
-				todo_api_4.h
+4_OBJECTS	=	src-4/main.c \
+				src-4/todo_api.h \
+				src-4/post_todo_handler.c \
+				src-4/list_ops.c
 
 4_OUTPUT	=	todo_api_4
 
 $(4_OUTPUT) : $(4_OBJECTS)
-	gcc -o $@ $^
+	gcc -g3 -o $@ $^
 

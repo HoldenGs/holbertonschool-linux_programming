@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#define MSG_SIZE			1028
+
 /**
  * struct list_s - list type for holding todo list info
  *
@@ -27,24 +29,13 @@ typedef struct list_s
 	int id;
 } list_t;
 
-/**
- * struct err_and_list_s - holds the head of the new todo list and the error
- * of the function
- *
- * @head: head of the new todo_list
- * @error: error if any error was set
- */
-typedef struct err_and_list_s
-{
-	list_t *head;
-	int error;
-} err_and_list_t;
-
-
 void exit_with_error(const char *err);
-list_t *handle_client(int client_socket, list_t *todo_list);
-err_and_list_t get_todo_post_params(char *msg, ssize_t msg_len, list_t *todo_list);
-list_t *initialize_todo(list_t *todo_list);
+void handle_client(int client_socket, list_t **todo_list, int *id_count);
+int post_todo(int client_socket, char *msg,
+ssize_t msg_len, list_t **todo_list, int *id_count);
+void find_parameters(char *msg, ssize_t msg_len, list_t *new_todo);
+list_t *initialize_todo(int *id_count);
+void add_todo_node(list_t *new_node, list_t **head, int *id_count);
 void send_data_to_client(list_t *todo_list, int client_socket);
 int check_for_header(char *msg, const char *header);
 void process_error(int error, int client_socket);
