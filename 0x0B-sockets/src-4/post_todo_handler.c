@@ -149,6 +149,8 @@ void send_data_to_client(list_t *todo_list, int client_socket)
 		strlen(todo_list->title) + \
 		strlen(todo_list->description);
 	ok_msg = malloc(clen + 77);
+	if (ok_msg == NULL)
+		exit_with_error("malloc() failed");
 	sprintf(
 		ok_msg,
 		"HTTP/1.1 201 Created\r\n\
@@ -158,6 +160,7 @@ Content-Type: application/json\r\n\
 {\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
 		clen, todo_list->id, todo_list->title, todo_list->description
 	);
+	printf("201 Created\n");
 	if (send(client_socket, ok_msg, strlen(ok_msg), 0) < 0)
 		exit_with_error("send() failed");
 }

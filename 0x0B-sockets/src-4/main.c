@@ -38,7 +38,7 @@ int main(void)
 		if (client_socket < 0)
 			exit_with_error("accept() failed");
 		client_name = inet_ntoa(client_addr.sin_addr);
-		printf("Client connected: %s\n", client_name);
+		printf("%s ", client_name);
 
 		handle_client(client_socket, &todo_list, &id_count);
 		close(client_socket);
@@ -58,7 +58,7 @@ int main(void)
 void handle_client(int client_socket, list_t **todo_list, int *id_count)
 {
 	char msg[MSG_SIZE];
-	int error;
+	int error, i;
 	ssize_t msg_size = 0;
 	list_t *tmp, *walk;
 
@@ -66,7 +66,13 @@ void handle_client(int client_socket, list_t **todo_list, int *id_count)
 	msg_size = recv(client_socket, msg, MSG_SIZE, 0);
 	if (msg_size < 0)
 		exit_with_error("recv() failed");
-	printf("Raw request: \"%s\"\n", msg);
+
+	for (i = 0; msg[i] != ' '; i++)
+		;
+	i++;
+	for (; msg[i] != ' '; i++)
+		;
+	printf("%.*s -> ", i, msg);
 
 	if (!strncmp(msg, "POST /todos", 11))
 		error = post_todo(client_socket, msg, msg_size, todo_list, id_count);
@@ -89,6 +95,7 @@ void process_error(int error, int client_socket)
 	{
 		char msg[] = "HTTP/1.1 422 Unprocessable Entity\r\n\r\n";
 
+		printf("422 Unprocessable Entity\n");
 		if (send(client_socket, msg, strlen(msg), 0) < 0)
 			exit_with_error("send() failed");
 	}
@@ -96,6 +103,7 @@ void process_error(int error, int client_socket)
 	{
 		char msg[] = "HTTP/1.1 411 Length Required\r\n\r\n";
 
+		printf("411 Length Required\n");
 		if (send(client_socket, msg, strlen(msg), 0) < 0)
 			exit_with_error("send() failed");
 	}
@@ -103,9 +111,11 @@ void process_error(int error, int client_socket)
 	{
 		char msg[] = "HTTP/1.1 404 Not found\r\n\r\n";
 
+		printf("404 Not found\n");
 		if (send(client_socket, msg, strlen(msg), 0) < 0)
 			exit_with_error("send() failed");
 	}
+	fflush(NULL);
 }
 
 /**

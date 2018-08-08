@@ -23,7 +23,7 @@ void add_todo_node(list_t *new_node, list_t **head, int *id_count)
 
 /**
  * initialize_todo - creates a new todo node
- * 
+ *
  * @id_count: pointer to id iterator
  *
  * Return: new todo node
