@@ -77,6 +77,7 @@ void handle_client(int client_socket)
 
 	if (send(client_socket, ok_msg, strlen(ok_msg), 0) < 0)
 		exit_with_error("send() failed");
+	fflush(NULL);
 }
 
 /**
