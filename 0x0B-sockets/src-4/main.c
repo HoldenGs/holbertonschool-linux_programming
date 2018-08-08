@@ -29,7 +29,7 @@ int main(void)
 	if (listen(server_socket, 64) < 0)
 		exit_with_error("listen() failed");
 	printf("Server listening on port %d\n", server_port);
-
+	fflush(NULL);
 	while (1)
 	{
 		client_addr_len = sizeof(client_addr);
@@ -116,7 +116,6 @@ void process_error(int error, int client_socket)
 		if (send(client_socket, msg, strlen(msg), 0) < 0)
 			exit_with_error("send() failed");
 	}
-	fflush(NULL);
 }
 
 /**
