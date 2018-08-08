@@ -80,6 +80,7 @@ void handle_client(int client_socket, list_t **todo_list, int *id_count)
 		error = 404;
 	if (error)
 		process_error(error, client_socket);
+	fflush(NULL);
 }
 
 /**
