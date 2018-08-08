@@ -134,7 +134,7 @@ int check_for_header(char *msg, const char *header)
 }
 
 /**
- * send_data_to_client - send the client back the proper response
+ * send_data_to_client - send the client back the the post todo response
  *
  * @todo_list: todo list holding (possibly) newly created data
  * @client_socket: socket fd of client
@@ -142,22 +142,22 @@ int check_for_header(char *msg, const char *header)
 void send_data_to_client(list_t *todo_list, int client_socket)
 {
 	char *ok_msg;
-	int clen;
+	int clen, l1, l2, l3, l4;
 
-	clen = strlen("{\"id\":,\"title\":\"\",\"description\":\"\"}") + \
-		int_len(todo_list->id) + \
-		strlen(todo_list->title) + \
-		strlen(todo_list->description);
+	l1 = strlen("{\"id\":,\"title\":\"\",\"description\":\"\"}");
+	l2 = int_len(todo_list->id);
+	l3 = strlen(todo_list->title);
+	l4 = strlen(todo_list->description);
+	clen = l1 + l2 + l3 + l4;
 	ok_msg = malloc(clen + 77);
 	if (ok_msg == NULL)
 		exit_with_error("malloc() failed");
 	sprintf(
 		ok_msg,
-		"HTTP/1.1 201 Created\r\n\
-Content-Length: %d\r\n\
-Content-Type: application/json\r\n\
-\r\n\
-{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
+		"HTTP/1.1 201 Created\r\n"
+		"Content-Length: %d\r\n"
+		"Content-Type: application/json\r\n\r\n"
+		"{\"id\":%d,\"title\":\"%s\",\"description\":\"%s\"}",
 		clen, todo_list->id, todo_list->title, todo_list->description
 	);
 	printf("201 Created\n");
