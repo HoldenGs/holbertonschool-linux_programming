@@ -41,3 +41,14 @@ $(2_OUTPUT) : $(2_OBJECTS)
 $(3_OUTPUT) : $(3_OBJECTS)
 	gcc -o $@ $^
 
+
+
+
+4_OBJECTS	=	todo_api_4.c \
+				todo_api_4.h
+
+4_OUTPUT	=	todo_api_4
+
+$(4_OUTPUT) : $(4_OBJECTS)
+	gcc -o $@ $^
+
