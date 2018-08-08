@@ -52,5 +52,5 @@ $(3_OUTPUT) : $(3_OBJECTS)
 4_OUTPUT	=	todo_api_4
 
 $(4_OUTPUT) : $(4_OBJECTS)
-	gcc -g3 -o $@ $^
+	gcc -o $@ $^
 
