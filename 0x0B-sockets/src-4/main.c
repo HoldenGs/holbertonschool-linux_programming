@@ -74,7 +74,7 @@ void handle_client(int client_socket, list_t **todo_list, int *id_count)
 		;
 	printf("%.*s -> ", i, msg);
 
-	if (!strncmp(msg, "POST /todos ", 12))
+	if (!strncmp(msg, "POST /todos HTTP/1.1\r\n", 22))
 		error = post_todo(client_socket, msg, msg_size, todo_list, id_count);
 	else
 		error = 404;
