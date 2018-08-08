@@ -19,7 +19,6 @@ int main(void)
 	server_socket = socket(PF_INET, SOCK_STREAM, 0);
 	if (server_socket < 0)
 		exit_with_error("socket() failed");
-
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(server_port);
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
@@ -73,7 +72,7 @@ void handle_client(int client_socket)
 	printf("Path: %.*s\n", i - print_start, msg + print_start);
 	print_start = i + 1;
 	for (i = i + 1; msg[i] != '\n'; i++);
-	printf("Version: %.*s\n", i - print_start, msg + print_start);
+	printf("Version: %.*s\n", i - print_start - 1, msg + print_start);
 
 	if (send(client_socket, ok_msg, strlen(ok_msg), 0) < 0)
 		exit_with_error("send() failed");
