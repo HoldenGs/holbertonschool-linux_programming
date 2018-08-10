@@ -112,9 +112,9 @@ void process_error(int error, int client_socket)
 	}
 	else if (error == 404)
 	{
-		char msg[] = "HTTP/1.1 404 Not found\r\n\r\n";
+		char msg[] = "HTTP/1.1 404 Not Found\r\n\r\n";
 
-		printf("404 Not found\n");
+		printf("404 Not Found\n");
 		if (send(client_socket, msg, strlen(msg), 0) < 0)
 			exit_with_error("send() failed");
 	}
