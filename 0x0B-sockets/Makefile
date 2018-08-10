@@ -66,4 +66,19 @@ $(4_OUTPUT) : $(4_OBJECTS)
 5_OUTPUT	=	todo_api_5
 
 $(5_OUTPUT) : $(5_OBJECTS)
+	gcc -o $@ $^
+
+
+
+
+6_OBJECTS	=	src-6/main.c \
+				src-6/todo_api.h \
+				src-6/post_todo_handler.c \
+				src-6/get_todos_handler.c \
+				src-6/get_todo_handler.c \
+				src-6/list_ops.c
+
+6_OUTPUT	=	todo_api_6
+
+$(6_OUTPUT) : $(6_OBJECTS)
 	gcc -g3 -o $@ $^
