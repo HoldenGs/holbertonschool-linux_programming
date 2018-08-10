@@ -54,3 +54,16 @@ $(3_OUTPUT) : $(3_OBJECTS)
 $(4_OUTPUT) : $(4_OBJECTS)
 	gcc -o $@ $^
 
+
+
+
+5_OBJECTS	=	src-5/main.c \
+				src-5/todo_api.h \
+				src-5/post_todo_handler.c \
+				src-5/get_todos_handler.c \
+				src-5/list_ops.c
+
+5_OUTPUT	=	todo_api_5
+
+$(5_OUTPUT) : $(5_OBJECTS)
+	gcc -g3 -o $@ $^
