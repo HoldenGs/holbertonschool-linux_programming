@@ -20,7 +20,7 @@ void exit_with_error(const char *err);
 int main(int ac, char **av)
 {
 	int client_socket;
-	short port;
+	unsigned short port;
 	char *host;
 	struct sockaddr_in server_addr;
 
