@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdarg.h>
 
-void exit_with_error(const char *err);
+void exit_with_error(const char *err, ...);
 
 /**
  * main - connect to a server and port specified by the first two args
@@ -25,7 +26,7 @@ int main(int ac, char **av)
 	struct sockaddr_in server_addr;
 
 	if (ac != 3)
-		exit_with_error("Usage: %s <host> <port>");
+		exit_with_error("Usage: %s <host> <port>", av[0]);
 
 	port = atoi(av[2]);
 	if (!strcmp(av[1], "localhost"))
@@ -57,8 +58,13 @@ int main(int ac, char **av)
  *
  * @err: message to use
  */
-void exit_with_error(const char *err)
+void exit_with_error(const char *err, ...)
 {
-	fprintf(stderr, "%s\n", err);
+	va_list args;
+
+	va_start(args, err);
+	vfprintf(stderr, err, args);
+	fprintf(stderr, "\n");
+	va_end(args);
 	exit(EXIT_FAILURE);
 }
