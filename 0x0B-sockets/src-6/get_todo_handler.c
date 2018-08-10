@@ -25,11 +25,11 @@ int get_todo(int client_socket, list_t *todo_list, int id)
 	if (walk == NULL)
 		return (404);
 	l1 = strlen("{\"id\":,\"title\":\"\",\"description\":\"\"}");
-	l2 = int_len(todo_list->id);
-	l3 = strlen(todo_list->title);
-	l4 = strlen(todo_list->description);
+	l2 = int_len(walk->id);
+	l3 = strlen(walk->title);
+	l4 = strlen(walk->description);
 	clen = l1 + l2 + l3 + l4;
-	ok_msg = malloc(clen + 77);
+	ok_msg = malloc(clen + 72);
 	if (ok_msg == NULL)
 		exit_with_error("malloc() failed");
 	sprintf(
