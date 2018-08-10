@@ -25,9 +25,9 @@ int get_todos(int client_socket, list_t *todo_list)
 		sprintf(
 			ok_msg,
 			"HTTP/1.1 200 OK\r\n"
-			"Content-Length: %d\r\n"
+			"Content-Length: %ld\r\n"
 			"Content-Type: application/json\r\n\r\n[%s]",
-			todos_len + 2, todos_str);
+			strlen(todos_str) + 2, todos_str);
 	}
 	else
 		sprintf(ok_msg, "%s", base_str);
