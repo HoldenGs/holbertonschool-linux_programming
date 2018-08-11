@@ -11,9 +11,7 @@
  */
 int delete_todo(int client_socket, list_t **todo_list, int id)
 {
-	char ok_msg[] = "HTTP/1.1 204 No Content\r\n"
-		"Content-Length: %d\r\n"
-		"Content-Type: application/json\r\n\r\n";
+	char ok_msg[] = "HTTP/1.1 204 No Content\r\n\r\n";
 	int clen, l1, l2, l3, l4;
 	list_t *walk, *prev;
 
