@@ -10,5 +10,7 @@
  */
 void *_realloc(void *ptr, size_t size)
 {
+	(void)size;
+
 	return (ptr);
 }
