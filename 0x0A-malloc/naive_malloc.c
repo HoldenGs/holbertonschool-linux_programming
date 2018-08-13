@@ -9,7 +9,7 @@
  */
 void *naive_malloc(size_t size)
 {
-	static void *heap_start = NULL;
+	static void *heap_start;
 	static size_t chunk_num = 0, page_multiple = 1;
 	void *prev, *ret, *brk_ret;
 	size_t page_size, chunk_size, i, space_left, offset;
