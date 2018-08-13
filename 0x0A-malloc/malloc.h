@@ -8,6 +8,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#define CURR_OFFSET(prev, size, heap_start)		(((char *)prev + \
+					sizeof(size_t) + size) - (char *)heap_start)
+
 void *naive_malloc(size_t size);
 
 void *_malloc(size_t size);
